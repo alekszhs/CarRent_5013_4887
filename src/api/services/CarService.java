@@ -1,0 +1,308 @@
+package api.services;
+
+import api.models.Car;
+import api.models.CarStatus;
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+// addCar(Car car)
+// Προσθήκη νέου αυτοκινήτου με ελέγχους:
+// - Το αντικείμενο να μην είναι null
+// - Το id να μην είναι κενό
+// - Η πινακίδα να μην είναι κενή
+// - Το status να μην είναι null
+// - Το id να είναι μοναδικό
+// - Η πινακίδα να είναι μοναδική
+
+// findById(String id)
+// Επιστρέφει το αυτοκίνητο με το συγκεκριμένο id ή null
+
+// findByPlate(String plate)
+// Επιστρέφει το αυτοκίνητο με τη συγκεκριμένη πινακίδα ή null
+
+// updateCar(String id, Car newData)
+// Ενημερώνει τα στοιχεία ενός αυτοκινήτου:
+// - brand, model, category, year, color, plate, status
+// Περιλαμβάνει έλεγχο ότι το id υπάρχει
+// + έλεγχο ότι η νέα πινακίδα δεν ανήκει σε άλλο αυτοκίνητο
+
+// deleteCar(String id)
+// Διαγράφει αυτοκίνητο από τη λίστα, αν υπάρχει
+
+// getAllCars()
+// Επιστρέφει όλα τα αυτοκίνητα
+
+// searchCars(String brand, String plate, String model, String color, CarStatus status)
+// Αναζήτηση αυτοκινήτου με συνδυασμό κριτηρίων:
+// - brand (προαιρετικό)
+// - plate (προαιρετικό)
+// - model (προαιρετικό)
+// - color (προαιρετικό)
+// - status (προαιρετικό)
+// Όσα κριτήρια είναι null/κενά -> αγνοούνται
+
+// isCarAvailable(String id)
+// Επιστρέφει true/false ανάλογα με το αν το αυτοκίνητο είναι διαθέσιμο
+
+// setCarStatus(String id, CarStatus status)
+// Αλλάζει την κατάσταση ενός αυτοκινήτου (AVAILABLE, RENTED, κτλ.)
+
+/**
+ * Handles all business logic for cars:
+ * loading, searching, adding, editing, and changing availability.
+ */
+public class CarService {
+
+    private final List<Car> cars = new ArrayList<>();
+
+    /**
+     * Adds a new car, ensuring unique id & license plate.
+     */
+    public void addCar(Car car) {
+
+        if (car == null)
+            throw new IllegalArgumentException("Car cannot be null!");
+
+        if (car.getId() == null || car.getId().isBlank())
+            throw new IllegalArgumentException("Invalid ID!");
+
+        if (car.getPlate() == null || car.getPlate().isBlank())
+            throw new IllegalArgumentException("Invalid license plate!");
+
+        if (car.getStatus() == null)
+            throw new IllegalArgumentException("Car status cannot be null!");
+
+        // unique checks
+        if (findById(car.getId()) != null)
+            throw new IllegalArgumentException("ID already exists!");
+
+        for (Car c : cars) {
+            if (c.getPlate().equalsIgnoreCase(car.getPlate())) {
+                throw new IllegalArgumentException("License plate already exists!");
+            }
+        }
+
+        cars.add(car);
+    }
+
+    /**
+     * Finds a car by its unique id.
+     */
+    public Car findById(String id) {
+        if (id == null || id.isBlank() ){return null;}
+
+        id = id.trim();
+
+        for (Car c : cars ){
+            if (c.getId().equals(id)){
+                return c;
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * Finds a car by its license plate.
+     * Returns the matching Car or null if no car is found.
+     */
+    public Car findByPlate(String plate) {
+        if (plate == null || plate.isBlank()) {
+            return null;
+        }
+
+        plate = plate.trim();
+
+        for (Car c : cars) {
+            // equalsIgnoreCase because plates are case-insensitive
+            if (c.getPlate() != null && c.getPlate().equalsIgnoreCase(plate)) {
+                return c;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Updates an existing car with new data.
+     * Finds the car by its id, validates conflicts (e.g. license plate),
+     * and updates all editable fields.
+     *
+     * @param id The id of the car to update.
+     * @param newData A Car object containing the updated information.
+     * @throws IllegalArgumentException if the car does not exist
+     *                                  or if the new plate conflicts with another car.
+     */
+    public void updateCar(String id, Car newData) {
+        // Find the existing car
+        Car existing = findById(id);
+        if (existing == null) {
+            throw new IllegalArgumentException("Car with id " + id + " does not exist.");
+        }
+
+        // ---- License plate conflict check ----
+        // Only check if user changed the plate
+        if (!existing.getPlate().equalsIgnoreCase(newData.getPlate())) {
+
+            Car carWithSamePlate = findByPlate(newData.getPlate());
+
+            // If another car already has the new plate -> ERROR
+            if (carWithSamePlate != null && carWithSamePlate != existing) {
+                throw new IllegalArgumentException("License plate already in use by another car.");
+            }
+        }
+
+        // ---- Update all fields ----
+        existing.setPlate(newData.getPlate());
+        existing.setBrand(newData.getBrand());
+        existing.setModel(newData.getModel());
+        existing.setType(newData.getType());
+        existing.setYear(newData.getYear());
+        existing.setColor(newData.getColor());
+        existing.setStatus(newData.getStatus());
+    }
+
+    /**
+     * Deletes a car from the system by its id.
+     * If the car does not exist, an exception is thrown.
+     *
+     * @param id The id of the car to delete.
+     * @throws IllegalArgumentException if the car is not found.
+     */
+    public void deleteCar(String id) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("Id cannot be null or empty.");
+        }
+
+        id = id.trim();
+
+        Car existing = findById(id);
+
+        if (existing == null) {
+            throw new IllegalArgumentException("Car with id " + id + " does not exist.");
+        }
+
+        cars.remove(existing);
+    }
+
+
+
+    /**
+     * Returns all cars.
+     */
+    public List<Car> getAllCars() {
+        return cars;
+    }
+
+    /**
+     * Searches cars using multiple criteria.
+     * Any null parameter is ignored.
+     */
+    public ArrayList<Car> searchCars(
+            String brand,
+            String plate,
+            String model,
+            String color,
+            CarStatus status
+    ) {
+        ArrayList<Car> results = new ArrayList<>();
+
+        for (Car c : cars) {
+
+            if (brand != null && !brand.isBlank()) {
+                if (c.getBrand() == null || !c.getBrand().equalsIgnoreCase(brand))
+                    continue;
+            }
+
+            if (plate != null && !plate.isBlank()) {
+                if (c.getPlate() == null || !c.getPlate().equalsIgnoreCase(plate))
+                    continue;
+            }
+
+            if (model != null && !model.isBlank()) {
+                if (c.getModel() == null || !c.getModel().equalsIgnoreCase(model))
+                    continue;
+            }
+
+            if (color != null && !color.isBlank()) {
+                if (c.getColor() == null || !c.getColor().equalsIgnoreCase(color))
+                    continue;
+            }
+
+            if (status != null) {
+                if (c.getStatus() != status)
+                    continue;
+            }
+
+            results.add(c);
+        }
+
+        return results;
+    }
+
+    // η αυτο ,πρεπει να διαλεξουμε
+    /**
+     * public List<Car> searchCars(String brand, String plate, String model, String color, CarStatus status) {
+     *     return cars.stream()
+     *             .filter(c -> brand == null || brand.isBlank() || c.getBrand().equalsIgnoreCase(brand))
+     *             .filter(c -> plate == null || plate.isBlank() || c.getPlate().equalsIgnoreCase(plate))
+     *             .filter(c -> model == null || model.isBlank() || c.getModel().equalsIgnoreCase(model))
+     *             .filter(c -> color == null || color.isBlank() || c.getColor().equalsIgnoreCase(color))
+     *             .filter(c -> status == null || c.getStatus() == status)
+     *             .toList();
+     * }
+     */
+
+
+
+    /**
+     * Checks if a car is available for renting.
+     *
+     * @param id The id of the car to check.
+     * @return true if the car exists and its status is AVAILABLE, false otherwise.
+     */
+    public boolean isCarAvailable(String id) {
+        if (id == null || id.isBlank()) {
+            return false;
+        }
+
+        id = id.trim();
+
+        Car c = findById(id);
+        if (c == null) {
+            return false; // car does not exist
+        }
+
+        return c.getStatus() == CarStatus.AVAILABLE;
+    }
+
+
+    /**
+     * Changes the status of a car (AVAILABLE, RENTED, IN_SERVICE, DAMAGED, etc.)
+     *
+     * @param id The id of the car.
+     * @param status The new status to apply.
+     * @throws IllegalArgumentException if the car does not exist or the status is null.
+     */
+    public void setCarStatus(String id, CarStatus status) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("Id cannot be null or empty.");
+        }
+
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null.");
+        }
+
+        id = id.trim();
+
+        Car c = findById(id);
+        if (c == null) {
+            throw new IllegalArgumentException("Car with id " + id + " does not exist.");
+        }
+
+        c.setStatus(status);
+    }
+
+}
