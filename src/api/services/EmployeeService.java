@@ -4,32 +4,6 @@ import api.models.Employee;
 import java.util.List;
 import java.util.ArrayList;
 
-// findByUsername(String username)
-// Επιστρέφει υπάλληλο βάσει username (unique). Χρήσιμο στο login και στο addEmployee.
-
-//findByEmail(String email)
-//Επιστρέφει υπάλληλο βασει email.Χρήσιμο για uniqueness.
-
-// addEmployee(Employee emp)
-// Προσθήκη νέου υπαλλήλου με ελέγχους:
-// - Το αντικείμενο να μην είναι null
-// - Το username να είναι μοναδικό
-// - Το email να είναι μοναδικό
-// - Το fullName να μην είναι κενό
-// - Το password να μην είναι κενό
-
-// validateLogin(String username, String password)
-// Έλεγχος διαπιστευτηρίων. Αν είναι σωστά, επιστρέφει τον Employee.
-// Αν όχι, επιστρέφει null.
-
-// deleteEmployee(String username)
-// Διαγραφή υπαλλήλου από το σύστημα. Ρίχνει εξαίρεση αν δεν υπάρχει.
-
-// getAllEmployees()
-// Επιστρέφει όλους τους υπαλλήλους.
-
-// Σημείωση: Το username είναι μοναδικό για κάθε υπάλληλο.
-
 public class EmployeeService {
     public final List<Employee> employees = new ArrayList<>();
 
@@ -167,9 +141,34 @@ public class EmployeeService {
         return emp.getPassword().equals(password);
     }
 
-    public void deleteEmployee(Employee emp){
+    /**
+     * Deletes an employee from the list.
+     *
+     * @param emp The employee object to delete. Cannot be null.
+     * @throws IllegalArgumentException If the provided employee is null.
+     * @throws IllegalStateException    If the employee does not exist in the list.
+     */
+    public void deleteEmployee(Employee emp) {
+        if (emp == null) {
+            // Validation: you cannot delete a null employee reference
+            throw new IllegalArgumentException("Employee cannot be null.");
+        }
 
+        // remove(emp) returns true if the employee existed and was removed
+        boolean removed = employees.remove(emp);
+
+        if (!removed) {
+            // Removal failed → the employee was not found in the list
+            throw new IllegalStateException("Employee not found in list.");
+        }
     }
 
-
+    /**
+     * Returns a full list of all registered employees.
+     *
+     * @return A List containing all Employee objects.
+     */
+    public List<Employee> getAllEmployees() {
+        return employees; // Direct reference (mutable list)
+    }
 }

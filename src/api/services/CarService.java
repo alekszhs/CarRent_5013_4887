@@ -7,47 +7,7 @@ import api.models.CarStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-// addCar(Car car)
-// Προσθήκη νέου αυτοκινήτου με ελέγχους:
-// - Το αντικείμενο να μην είναι null
-// - Το id να μην είναι κενό
-// - Η πινακίδα να μην είναι κενή
-// - Το status να μην είναι null
-// - Το id να είναι μοναδικό
-// - Η πινακίδα να είναι μοναδική
 
-// findById(String id)
-// Επιστρέφει το αυτοκίνητο με το συγκεκριμένο id ή null
-
-// findByPlate(String plate)
-// Επιστρέφει το αυτοκίνητο με τη συγκεκριμένη πινακίδα ή null
-
-// updateCar(String id, Car newData)
-// Ενημερώνει τα στοιχεία ενός αυτοκινήτου:
-// - brand, model, category, year, color, plate, status
-// Περιλαμβάνει έλεγχο ότι το id υπάρχει
-// + έλεγχο ότι η νέα πινακίδα δεν ανήκει σε άλλο αυτοκίνητο
-
-// deleteCar(String id)
-// Διαγράφει αυτοκίνητο από τη λίστα, αν υπάρχει
-
-// getAllCars()
-// Επιστρέφει όλα τα αυτοκίνητα
-
-// searchCars(String brand, String plate, String model, String color, CarStatus status)
-// Αναζήτηση αυτοκινήτου με συνδυασμό κριτηρίων:
-// - brand (προαιρετικό)
-// - plate (προαιρετικό)
-// - model (προαιρετικό)
-// - color (προαιρετικό)
-// - status (προαιρετικό)
-// Όσα κριτήρια είναι null/κενά -> αγνοούνται
-
-// isCarAvailable(String id)
-// Επιστρέφει true/false ανάλογα με το αν το αυτοκίνητο είναι διαθέσιμο
-
-// setCarStatus(String id, CarStatus status)
-// Αλλάζει την κατάσταση ενός αυτοκινήτου (AVAILABLE, RENTED, κτλ.)
 
 /**
  * Handles all business logic for cars:

@@ -6,46 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// findByAfm(String afm)
-// Επιστρέφει τον πελάτη με το συγκεκριμένο ΑΦΜ ή null
-
-
-// addCustomer(Customer customer)
-// Προσθήκη νέου πελάτη με ελέγχους:
-// - Το αντικείμενο να μην είναι null
-// - Το ΑΦΜ να μην είναι κενό
-// - Το ΑΦΜ να είναι μοναδικό στο σύστημα
-// - Το ονοματεπώνυμο να μην είναι κενό
-// - Το τηλέφωνο να μην είναι κενό
-// - Το email να μην είναι κενό (και να έχει έλεγχο μορφής προαιρετικά)
-
-// findByAfm(String afm)
-// Αναζήτηση πελάτη βάσει ΑΦΜ (unique identifier)
-// Επιστρέφει τον πελάτη ή null
-
-// updateCustomer(String afm, Customer newData)
-// Ενημερώνει τα στοιχεία του πελάτη:
-// - ονοματεπώνυμο, τηλέφωνο, email
-// Έλεγχος ότι:
-// - Ο πελάτης υπάρχει
-// - Το νέο ΑΦΜ δεν ανήκει σε άλλον πελάτη (αν αλλάξει)
-
-// deleteCustomer(String afm)
-// Διαγράφει πελάτη από το σύστημα
-// Ρίχνει εξαίρεση αν ο πελάτης δεν υπάρχει
-
-// getAllCustomers()
-// Επιστρέφει όλους τους πελάτες
-
-// searchCustomers(String afm, String name, String phone)
-// Αναζήτηση πελατών με πολλαπλά προαιρετικά κριτήρια:
-// - ΑΦΜ (προαιρετικό – ακριβές ταίριασμα)
-// - Ονοματεπώνυμο (προαιρετικό – case-insensitive)
-// - Τηλέφωνο (προαιρετικό – ακριβές)
-
-
-
-
 /**
  * Handles all business logic related to customers:
  * loading, searching, creating and updating customer records.
