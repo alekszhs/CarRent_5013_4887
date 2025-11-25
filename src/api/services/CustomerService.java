@@ -96,7 +96,7 @@ public class CustomerService {
 
         // Validate AFM
         if (customer.getAfm() == null || customer.getAfm().isBlank()) {
-            throw new IllegalArgumentException("AFM cannot be empty.");
+            throw new IllegalArgumentException("AFM cannot be null or empty.");
         }
 
         String afm = customer.getAfm().trim();

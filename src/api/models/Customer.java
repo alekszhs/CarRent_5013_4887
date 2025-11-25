@@ -1,93 +1,120 @@
 package api.models;
 
 /**
- * This class represents a person who can rent cars from the company
- * Each customer has a unique afm, full name, phone number, email adress.
- * @author Alexandros Gkourdoglou AM5013
- * @author /--/ XXXX(fill it later)
+ * Represents a customer who can rent cars from the company.
+ * <p>
+ * Each customer has a unique AFM (tax number), full name,
+ * phone number and email. This class provides validation
+ * through setter methods and simple identity definition
+ * via the AFM field.
+ * </p>
+ *
+ * @version 1.1
+ * @author ...
  */
 public class Customer {
-    private String afm; // Unique tax identification number
-    private String fullName; // Name and surname
-    private String phoneNumber; // 10 digits number
-    private String email; // email address  example@gmail.com
+
+    // ==================== Fields ====================
+
+    private String afm;         // Unique tax number (9 digits)
+    private String fullName;    // Full name of the customer
+    private String phoneNumber; // Phone number (10 digits in Greece)
+    private String email;       // Email address
+
+
+    // ==================== Constructor ====================
 
     /**
-     * Constructs a Customer object
-     * @param afm unique tax number per Customer
-     * @param fullName name and surname of the Customer
-     * @param phoneNumber Phone number of the Customer
-     * @param email email of the Customer
+     * Creates a Customer object with the required fields.
+     * All input is validated through setters.
+     *
+     * @param afm         the 9-digit tax number
+     * @param fullName    the customer's full name
+     * @param phoneNumber the customer's phone number (10 digits)
+     * @param email       the customer's email
+     *
+     * @throws IllegalArgumentException if any field is invalid
      */
-    public Customer(String afm, String fullName, String phoneNumber, String email){
-        this.afm = afm;
-        this.fullName = fullName;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
+    public Customer(String afm, String fullName, String phoneNumber, String email) {
+        setAfm(afm);
+        setFullName(fullName);
+        setPhoneNumber(phoneNumber);
+        setEmail(email);
     }
 
-    //Getters
-    public String getAfm(){
-        return afm;
-    }
 
-    public String getFullName(){
-        return fullName;
-    }
+    // ==================== Getters ====================
 
-    public String getPhoneNumber(){
-        return phoneNumber;
-    }
+    public String getAfm()         { return afm; }
+    public String getFullName()    { return fullName; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public String getEmail()       { return email; }
 
-    public String getEmail(){
-        return email;
-    }
 
-    //Setters
+    // ==================== Setters with Validation ====================
+
+    /**
+     * Sets the customer's AFM (must be exactly 9 digits).
+     */
     public void setAfm(String afm) {
-        if (afm == null)
-            throw new IllegalArgumentException("AFM cannot be null");
+        if (afm == null || afm.isBlank())
+            throw new IllegalArgumentException("AFM cannot be null or empty.");
 
         afm = afm.trim();
 
         if (!afm.matches("\\d{9}"))
-            throw new IllegalArgumentException("Invalid AFM format");
+            throw new IllegalArgumentException("AFM must consist of exactly 9 digits.");
 
         this.afm = afm;
     }
 
+    /**
+     * Sets the customer's full name.
+     */
+    public void setFullName(String fullName) {
+        if (fullName == null || fullName.isBlank())
+            throw new IllegalArgumentException("Full name cannot be empty.");
 
-    public void setFullName(String fullName){
-        this.fullName = fullName;
+        this.fullName = fullName.trim();
     }
 
+    /**
+     * Sets the customer's phone number (must be exactly 10 digits).
+     */
     public void setPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null)
-            throw new IllegalArgumentException("Phone number cannot be null");
+        if (phoneNumber == null || phoneNumber.isBlank())
+            throw new IllegalArgumentException("Phone number cannot be empty.");
 
         phoneNumber = phoneNumber.trim();
 
         if (!phoneNumber.matches("\\d{10}"))
-            throw new IllegalArgumentException("Phone number must be exactly 10 digits");
+            throw new IllegalArgumentException("Phone number must have exactly 10 digits.");
 
         this.phoneNumber = phoneNumber;
     }
 
-
+    /**
+     * Sets the customer's email, validating its format.
+     */
     public void setEmail(String email) {
-        if (email == null)
-            throw new IllegalArgumentException("Email cannot be null");
+        if (email == null || email.isBlank())
+            throw new IllegalArgumentException("Email cannot be empty.");
 
         email = email.trim();
 
-        if (!email.contains("@") || !email.substring(email.indexOf("@")).contains("."))
-            throw new IllegalArgumentException("Invalid email format");
+        // Basic but correct email validation (not the weak version you had)
+        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
+            throw new IllegalArgumentException("Invalid email format.");
 
         this.email = email;
     }
 
 
-    //equals and hashcode
+    // ==================== Equals & HashCode ====================
+
+    /**
+     * Customers are considered equal if they share the same AFM.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,12 +125,14 @@ public class Customer {
 
     @Override
     public int hashCode() {
-        return afm.hashCode();
+        return afm == null ? 0 : afm.hashCode();
     }
 
 
+    // ==================== ToString ====================
+
     /**
-     * Returns a readable text representation of the customer.
+     * Returns a readable representation of the customer.
      */
     @Override
     public String toString() {
