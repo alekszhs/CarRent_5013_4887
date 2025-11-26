@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="gui.CustomerRentalHistoryController"
+            prefWidth="700" prefHeight="450">
+
+    <top>
+        <VBox spacing="10" style="-fx-padding: 15;">
+            <Label text="Rental History" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Customer AFM:"/>
+                <TextField fx:id="txtAfm" prefWidth="150"/>
+
+                <Label text="Car Plate:"/>
+                <TextField fx:id="txtPlate" prefWidth="120"/>
+
+                <Button text="Search" onAction="#handleSearch"/>
+                <Button text="Clear" onAction="#handleClear"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tableResults">
+            <columns>
+                <TableColumn fx:id="colId" text="Rental ID" prefWidth="90"/>
+                <TableColumn fx:id="colPlate" text="Car Plate" prefWidth="100"/>
+                <TableColumn fx:id="colAfm" text="AFM" prefWidth="110"/>
+                <TableColumn fx:id="colStart" text="From" prefWidth="130"/>
+                <TableColumn fx:id="colEnd" text="To" prefWidth="130"/>
+                <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <Label fx:id="lblStatus" style="-fx-padding: 10; -fx-font-size: 14;"/>
+    </bottom>
+</BorderPane>

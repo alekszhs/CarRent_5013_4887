@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class EmployeeService {
-    public final List<Employee> employees = new ArrayList<>();
+    private final List<Employee> employees = new ArrayList<>();
 
     /**
      * Finds an employee by their username.

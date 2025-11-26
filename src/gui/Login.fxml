@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefWidth="400" prefHeight="250" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="gui.LoginController">
+
+    <children>
+        <VBox spacing="15" alignment="CENTER" AnchorPane.topAnchor="20"
+              AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20">
+
+            <Label text="Car Rental Login" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+
+            <TextField fx:id="txtUsername" promptText="Username" maxWidth="250"/>
+            <PasswordField fx:id="txtPassword" promptText="Password" maxWidth="250"/>
+
+            <Button text="Login" fx:id="btnLogin" maxWidth="250"
+                    onAction="#handleLoginButton"/>
+
+            <Label fx:id="lblMessage" textFill="red" style="-fx-font-weight:bold;"/>
+        </VBox>
+    </children>
+</AnchorPane>

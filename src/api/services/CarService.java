@@ -20,7 +20,7 @@ public class CarService {
     /**
      * Adds a new car, ensuring unique id & license plate.
      */
-    public void addCar(Car car) {
+    public boolean addCar(Car car) {
 
         if (car == null)
             throw new IllegalArgumentException("Car cannot be null!");
@@ -36,16 +36,18 @@ public class CarService {
 
         // unique checks
         if (findById(car.getId()) != null)
-            throw new IllegalArgumentException("ID already exists!");
+            return false; // ID already exists
 
         for (Car c : cars) {
             if (c.getPlate().equalsIgnoreCase(car.getPlate())) {
-                throw new IllegalArgumentException("License plate already exists!");
+                return false; // license exists
             }
         }
 
         cars.add(car);
+        return true; // SUCCESS
     }
+
 
     /**
      * Finds a car by its unique id.

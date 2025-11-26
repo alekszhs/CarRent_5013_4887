@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.DatePicker?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="gui.RentalFormController"
+      spacing="15" alignment="CENTER" style="-fx-padding:20;">
+
+    <Label text="Create Rental" style="-fx-font-size:20; -fx-font-weight:bold"/>
+
+    <HBox spacing="20">
+        <VBox spacing="5">
+            <Label text="Car"/>
+            <ComboBox fx:id="carBox" prefWidth="250"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Customer"/>
+            <ComboBox fx:id="customerBox" prefWidth="250"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="20">
+        <VBox spacing="5">
+            <Label text="Start Date"/>
+            <DatePicker fx:id="startDate" />
+        </VBox>
+        <VBox spacing="5">
+            <Label text="End Date"/>
+            <DatePicker fx:id="endDate" />
+        </VBox>
+    </HBox>
+
+    <Label fx:id="lblStatus" style="-fx-text-fill:red;"/>
+
+    <HBox spacing="20">
+        <Button text="Create Rental" style="-fx-font-size:14" onAction="#handleCreateRental"/>
+        <Button text="Back" style="-fx-font-size:14" onAction="#goBack"/>
+    </HBox>
+
+</VBox>

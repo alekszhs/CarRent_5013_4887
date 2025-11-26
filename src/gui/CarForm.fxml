@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="gui.CarFormController"
+            prefWidth="750" prefHeight="500">
+
+    <top>
+        <Label text="Manage Cars"
+               style="-fx-font-size: 22; -fx-font-weight: bold; -fx-padding: 15;"/>
+    </top>
+
+    <center>
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 15;">
+            <TableView fx:id="tableCars" prefHeight="320" prefWidth="700">
+                <columns>
+                    <TableColumn fx:id="colId"      text="ID"        prefWidth="70"/>
+                    <TableColumn fx:id="colPlate"   text="Plate"     prefWidth="120"/>
+                    <TableColumn fx:id="colBrand"   text="Brand"     prefWidth="120"/>
+                    <TableColumn fx:id="colModel"   text="Model"     prefWidth="120"/>
+                    <TableColumn fx:id="colYear"    text="Year"      prefWidth="80"/>
+                    <TableColumn fx:id="colColor"   text="Color"     prefWidth="100"/>
+                    <TableColumn fx:id="colStatus"  text="Status"    prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <HBox spacing="10">
+                <TextField fx:id="txtId"      promptText="ID"         prefWidth="80"/>
+                <TextField fx:id="txtPlate"   promptText="Plate"      prefWidth="120"/>
+                <TextField fx:id="txtBrand"   promptText="Brand"      prefWidth="120"/>
+                <TextField fx:id="txtModel"   promptText="Model"      prefWidth="120"/>
+                <TextField fx:id="txtYear"    promptText="Year"       prefWidth="80"/>
+                <TextField fx:id="txtColor"   promptText="Color"      prefWidth="100"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER">
+                <Button text="Add"    prefWidth="100" onAction="#handleAdd"/>
+                <Button text="Update" prefWidth="100" onAction="#handleUpdate"/>
+                <Button text="Delete" prefWidth="100" onAction="#handleDelete"/>
+            </HBox>
+
+            <Label fx:id="lblStatus" style="-fx-font-size:14; -fx-padding:5; -fx-text-fill:#444;"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <Button text="Back"
+                prefWidth="100"
+                style="-fx-padding:10; -fx-font-size:14;"
+                onAction="#goBack"/>
+    </bottom>
+
+</BorderPane>
