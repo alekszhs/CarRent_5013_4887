@@ -2,11 +2,20 @@ package gui;
 
 import api.models.Rental;
 import api.models.RentalStatus;
-import api.services.RentalService;
+import api.services.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+
+import javafx.event.ActionEvent;
+import api.models.Employee;
+import api.services.RentalService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,10 +33,22 @@ public class ReturnRentalController {
     @FXML private TableColumn<Rental, String> colEnd;
     @FXML private Label lblStatus;
 
+    private CarService carService;
+    private EmployeeService employeeService;
+    private CustomerService customerService;
     private RentalService rentalService;
+    private Employee loggedEmployee;
 
-    public void init(RentalService rentalService){
+    public void init(EmployeeService empService,
+                     CarService carService,
+                     CustomerService customerService,
+                     RentalService rentalService,
+                     Employee loggedEmployee) {
+        this.employeeService = empService;
+        this.carService = carService;
+        this.customerService = customerService;
         this.rentalService = rentalService;
+        this.loggedEmployee = loggedEmployee;
         setupTable();
     }
 
@@ -93,5 +114,18 @@ public class ReturnRentalController {
         } else {
             lblStatus.setText("Could not return rental (maybe already completed).");
         }
+    }
+
+    @FXML
+    public void goBack(ActionEvent event) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu.fxml"));
+        Parent root = loader.load();
+
+        MainMenuController controller = loader.getController();
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().setRoot(root);
+        stage.setTitle("Main Menu");
     }
 }

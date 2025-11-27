@@ -1,13 +1,19 @@
 package gui;
 
 import api.models.Customer;
-import api.services.CustomerService;
+import api.services.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+import api.models.Employee;
+import api.services.CustomerService;
 
 public class CustomerFormController {
 
@@ -24,12 +30,24 @@ public class CustomerFormController {
 
     @FXML private Label lblStatus;
 
+    private CarService carService;
+    private EmployeeService employeeService;
     private CustomerService customerService;
+    private RentalService rentalService;
+    private Employee loggedEmployee;
 
 
     // ================== Init from MainMenu ==================
-    public void init(CustomerService service){
-        this.customerService = service;
+    public void init(EmployeeService empService,
+                     CarService carService,
+                     CustomerService customerService,
+                     RentalService rentalService,
+                     Employee loggedEmployee) {
+        this.employeeService = empService;
+        this.carService = carService;
+        this.customerService = customerService;
+        this.rentalService = rentalService;
+        this.loggedEmployee = loggedEmployee;
         loadTable();
         setupRowClickFill();
     }
@@ -133,8 +151,15 @@ public class CustomerFormController {
 
     // ================== Back ==================
     @FXML
-    public void goBack(){
-        Stage stage = (Stage) ((Node) tableCustomers).getScene().getWindow();
-        stage.close();
+    public void goBack(ActionEvent event) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu.fxml"));
+        Parent root = loader.load();
+
+        MainMenuController controller = loader.getController();
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().setRoot(root);
+        stage.setTitle("Main Menu");
     }
 }

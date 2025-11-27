@@ -6,7 +6,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="gui.CarFormController"
-            prefWidth="750" prefHeight="500">
+            prefWidth="500" prefHeight="350">
 
     <top>
         <Label text="Manage Cars"

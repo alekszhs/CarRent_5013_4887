@@ -19,7 +19,7 @@ public class LoginController {
 
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
-    @FXML private Label lblStatus;
+    @FXML private Label lblStatus; // όχι lblMessage – consistency matters
 
     private EmployeeService employeeService;
     private CarService carService;
@@ -37,28 +37,47 @@ public class LoginController {
         this.rentalService = rentalService;
     }
 
+    // ------------------ LOGIN HANDLER ------------------ //
+
     @FXML
-    private void handleLoginButton() throws Exception {
+    private void handleLoginButton() {
 
-        String user = txtUsername.getText().trim();
-        String pass = txtPassword.getText().trim();
+        try {
+            String user = txtUsername.getText().trim();
+            String pass = txtPassword.getText().trim();
 
-        if (!employeeService.validateLogin(user, pass)) {
-            lblStatus.setText("❌ Λάθος στοιχεία");
-            return;
+            // 1) Empty validation
+            if (user.isEmpty() || pass.isEmpty()) {
+                lblStatus.setText("Συμπλήρωσε όλα τα πεδία");
+                return;
+            }
+
+            // 2) Check credentials
+            if (!employeeService.validateLogin(user, pass)) {
+                lblStatus.setText("Λάθος στοιχεία");
+                return;
+            }
+
+            // 3) Fetch logged user object
+            Employee logged = employeeService.findByUsername(user);
+
+            // 4) Load MainMenu view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
+            Parent root = loader.load();
+            MainMenuController controller = loader.getController();
+            controller.init(employeeService, carService, customerService, rentalService, logged);
+
+            // 5) Switch scene
+            Stage stage = (Stage) txtUsername.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.centerOnScreen();
+            stage.setTitle("Car Rental System");
+            stage.show();
+
+        } catch (Exception e) {
+            lblStatus.setText("Σφάλμα συστήματος — δοκίμασέ το πάλι");
+            e.printStackTrace(); // LOG ONLY — όχι σε prod
         }
-
-        Employee logged = employeeService.findByUsername(user);
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
-        Parent root = loader.load();
-
-        MainMenuController controller = loader.getController();
-        controller.init(employeeService, carService, customerService, rentalService, logged);
-
-
-        Stage stage = (Stage) txtUsername.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 }
+

@@ -7,13 +7,16 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="gui.ReturnRentalController"
-      spacing="15" alignment="CENTER_LEFT" style="-fx-padding:20;">
+      spacing="15"
+      alignment="CENTER_LEFT"
+      style="-fx-padding:20;"
+      prefWidth="500" prefHeight="350">
 
-    <Label text="Return Rental" style="-fx-font-size:20; -fx-font-weight:bold"/>
+    <Label text="Return Rental" style="-fx-font-size:22; -fx-font-weight:bold"/>
 
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="Rental ID:"/>
-        <TextField fx:id="txtRentalId" prefWidth="120"/>
+        <TextField fx:id="txtRentalId" prefWidth="200"/>
         <Button text="Return" onAction="#handleReturn"/>
     </HBox>
 
@@ -23,24 +26,27 @@
 
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="AFM:"/>
-        <TextField fx:id="txtAfm" prefWidth="130"/>
+        <TextField fx:id="txtAfm" prefWidth="200"/>
 
         <Label text="Plate:"/>
-        <TextField fx:id="txtPlate" prefWidth="100"/>
+        <TextField fx:id="txtPlate" prefWidth="150"/>
 
         <Button text="Search" onAction="#handleSearch"/>
     </HBox>
 
-    <TableView fx:id="tableActive" prefHeight="260">
+    <TableView fx:id="tableActive" prefHeight="380">
         <columns>
-            <TableColumn fx:id="colId" text="Rental ID" prefWidth="90"/>
-            <TableColumn fx:id="colPlate" text="Car Plate" prefWidth="100"/>
-            <TableColumn fx:id="colAfm" text="AFM" prefWidth="110"/>
-            <TableColumn fx:id="colStart" text="From" prefWidth="130"/>
-            <TableColumn fx:id="colEnd" text="To" prefWidth="130"/>
+            <TableColumn fx:id="colId" text="Rental ID" prefWidth="100"/>
+            <TableColumn fx:id="colPlate" text="Car Plate" prefWidth="120"/>
+            <TableColumn fx:id="colAfm" text="AFM" prefWidth="130"/>
+            <TableColumn fx:id="colStart" text="From" prefWidth="150"/>
+            <TableColumn fx:id="colEnd" text="To" prefWidth="150"/>
         </columns>
     </TableView>
 
     <Label fx:id="lblStatus" style="-fx-font-size:14;"/>
+
+    <!-- Κουμπί Back -->
+    <Button text="Back" onAction="#goBack"/>
 
 </VBox>

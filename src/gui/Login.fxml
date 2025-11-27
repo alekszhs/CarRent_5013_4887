@@ -20,7 +20,7 @@
             <Button text="Login" fx:id="btnLogin" maxWidth="250"
                     onAction="#handleLoginButton"/>
 
-            <Label fx:id="lblMessage" textFill="red" style="-fx-font-weight:bold;"/>
+            <Label fx:id="lblStatus" textFill="red" style="-fx-font-weight:bold;"/>
         </VBox>
     </children>
 </AnchorPane>

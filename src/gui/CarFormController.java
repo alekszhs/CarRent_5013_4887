@@ -6,10 +6,18 @@ import api.services.CarService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
+import javafx.event.ActionEvent;
+import api.models.Employee;
+import api.services.EmployeeService;
+import api.services.CustomerService;
+import api.services.RentalService;
 
 public class CarFormController {
 
@@ -32,13 +40,27 @@ public class CarFormController {
     @FXML private Label lblStatus;
 
     private CarService carService;
-
+    private EmployeeService employeeService;
+    private CustomerService customerService;
+    private RentalService rentalService;
+    private Employee loggedEmployee;
 
     // === init για injection από Menu ===
-    public void init(CarService carService){
+    public void init(EmployeeService empService,
+                     CarService carService,
+                     CustomerService customerService,
+                     RentalService rentalService,
+                     Employee loggedEmployee) {
+        this.employeeService = empService;
         this.carService = carService;
+        this.customerService = customerService;
+        this.rentalService = rentalService;
+        this.loggedEmployee = loggedEmployee;
+
+
         loadTable();
     }
+
 
 
     // === Φόρτωση δεδομένων στον πίνακα ===
@@ -120,10 +142,16 @@ public class CarFormController {
     }
 
 
-    // === BACK ===
     @FXML
-    public void goBack(){
-        Stage stage = (Stage) ((Node) tableCars).getScene().getWindow();
-        stage.close();
+    public void goBack(ActionEvent event) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu.fxml"));
+        Parent root = loader.load();
+
+        MainMenuController controller = loader.getController();
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().setRoot(root);
+        stage.setTitle("Main Menu");
     }
 }

@@ -10,6 +10,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+import javafx.scene.Node;
 
 public class MainMenuController {
 
@@ -32,105 +34,90 @@ public class MainMenuController {
     }
 
     @FXML
-    private void openCars() throws Exception {
+    private void openCars(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("CarForm.fxml"));
         Parent root = loader.load();
 
         CarFormController controller = loader.getController();
-        controller.init(carService);
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
 
-        Stage stage = new Stage();
+        // Παίρνω το Stage από το κουμπί που πάτησε ο χρήστης
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        // Αλλάζω τη σκηνή στο ίδιο παράθυρο
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
         stage.setTitle("Manage Cars");
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 
     @FXML
-    private void openCustomers() throws Exception {
+    private void openCustomers(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("CustomerForm.fxml"));
         Parent root = loader.load();
 
         CustomerFormController controller = loader.getController();
-        controller.init(customerService);
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
 
-        Stage stage = new Stage();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
         stage.setTitle("Manage Customers");
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 
     @FXML
-    private void openRentalForm() throws Exception {
+    private void openRentalForm(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("RentalForm.fxml"));
         Parent root = loader.load();
 
         RentalFormController controller = loader.getController();
-        controller.init(carService, customerService, rentalService, loggedEmployee);
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
 
-        Stage stage = new Stage();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
         stage.setTitle("New Rental");
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 
     @FXML
-    public void openHistory(){
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("CustomerRentalHistory.fxml"));
-            Parent root = loader.load();
-
-            CustomerRentalHistoryController controller = loader.getController();
-            controller.init(rentalService);
-
-            Stage stage = new Stage();
-            stage.setTitle("Rental History");
-            stage.setScene(new Scene(root));
-            stage.show();
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-    @FXML
-    private void openReturnRental() throws Exception {
+    private void openReturnRental(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("ReturnRental.fxml"));
         Parent root = loader.load();
 
         ReturnRentalController controller = loader.getController();
-        controller.init(rentalService);
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
 
-        Stage stage = new Stage();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().setRoot(root);
         stage.setTitle("Return Rental");
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 
     @FXML
-    private void logout() throws Exception {
-        // κλείνω το τρέχον παράθυρο
-        Stage current = (Stage) javafx.stage.Window.getWindows().stream()
-                .filter(Stage.class::isInstance)
-                .map(Stage.class::cast)
-                .filter(Stage::isFocused)
-                .findFirst()
-                .orElse(null);
+    private void openHistory(ActionEvent event) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("CustomerRentalHistory.fxml"));
+        Parent root = loader.load();
 
-        if (current != null) {
-            current.close();
-        }
+        CustomerRentalHistoryController controller = loader.getController();
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
 
-        // ξαναδείχνω Login
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().setRoot(root);
+        stage.setTitle("Rental History");
+    }
+
+    @FXML
+    private void logout(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
         Parent root = loader.load();
 
         LoginController controller = loader.getController();
         controller.init(employeeService, carService, customerService, rentalService);
 
-        Stage stage = new Stage();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root, 400, 250); //  σταθερό μέγεθος
+        stage.setScene(scene);
+
         stage.setTitle("Car Rental - Login");
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 }
