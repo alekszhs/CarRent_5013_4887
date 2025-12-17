@@ -1,0 +1,32 @@
+.root {
+    -fx-background-color: #2b2b2b; /* Σκούρο γκρι background */
+}
+
+.label {
+    -fx-text-fill: #e0e0e0; /* Ανοιχτό γκρι για αντίθεση */
+    -fx-font-size: 14px;
+}
+
+.text-field {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: #ffffff;
+    -fx-prompt-text-fill: #aaaaaa;
+    -fx-border-color: #555555;
+}
+
+.button {
+    -fx-background-color: #444444;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 5;
+}
+.button:hover {
+    -fx-background-color: #666666;
+}
+
+.table-view {
+    -fx-background-color: #3c3c3c;
+    -fx-control-inner-background: #3c3c3c;
+    -fx-text-background-color: #ffffff;
+    -fx-table-cell-border-color: #555555;
+    -fx-border-color: #555555;
+}

@@ -6,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Main extends Application {
 
     private EmployeeService employeeService = new EmployeeService();
@@ -28,6 +30,11 @@ public class Main extends Application {
         FXMLLoader fx = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
 
         Scene scene = new Scene(fx.load());
+
+        scene.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/gui/dark-theme.css")).toExternalForm()
+        );
+
 
         gui.LoginController controller = fx.getController();
         controller.init(employeeService, carService, customerService, rentalService);

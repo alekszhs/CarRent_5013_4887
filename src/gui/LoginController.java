@@ -15,16 +15,27 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class LoginController {
 
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
     @FXML private Label lblStatus; // όχι lblMessage – consistency matters
+    @FXML private javafx.scene.control.Button btnLogin;
+
 
     private EmployeeService employeeService;
     private CarService carService;
     private CustomerService customerService;
     private RentalService rentalService;
+
+    @FXML
+    public void initialize() {
+        btnLogin.setDefaultButton(true);             // Enter κάνει login
+        txtPassword.setOnAction(e -> handleLoginButton());
+        txtUsername.setOnAction(e -> txtPassword.requestFocus());
+    }
 
     public void init(EmployeeService empService,
                      CarService carService,
@@ -68,11 +79,14 @@ public class LoginController {
             controller.init(employeeService, carService, customerService, rentalService, logged);
 
             // 5) Switch scene
+
+
             Stage stage = (Stage) txtUsername.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
+            stage.sizeToScene();
             stage.centerOnScreen();
             stage.setTitle("Car Rental System");
-            stage.show();
+
 
         } catch (Exception e) {
             lblStatus.setText("Σφάλμα συστήματος — δοκίμασέ το πάλι");

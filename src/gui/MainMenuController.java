@@ -43,11 +43,10 @@ public class MainMenuController {
 
         // Παίρνω το Stage από το κουμπί που πάτησε ο χρήστης
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        // Αλλάζω τη σκηνή στο ίδιο παράθυρο
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
+        stage.getScene().setRoot(root);
+        stage.sizeToScene();
         stage.setTitle("Manage Cars");
+
     }
 
     @FXML
@@ -59,10 +58,10 @@ public class MainMenuController {
         controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
+        stage.getScene().setRoot(root);
+        stage.sizeToScene();
         stage.setTitle("Manage Customers");
+
     }
 
     @FXML
@@ -74,10 +73,10 @@ public class MainMenuController {
         controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
+        stage.getScene().setRoot(root);
+        stage.sizeToScene();
         stage.setTitle("New Rental");
+
     }
 
     @FXML
@@ -90,6 +89,7 @@ public class MainMenuController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
+        stage.sizeToScene();
         stage.setTitle("Return Rental");
     }
 
@@ -103,6 +103,7 @@ public class MainMenuController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
+        stage.sizeToScene();
         stage.setTitle("Rental History");
     }
 
@@ -115,9 +116,11 @@ public class MainMenuController {
         controller.init(employeeService, carService, customerService, rentalService);
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root, 400, 250); //  σταθερό μέγεθος
-        stage.setScene(scene);
+        stage.getScene().setRoot(root);
 
         stage.setTitle("Car Rental - Login");
+        stage.sizeToScene();
+        stage.centerOnScreen();
+
     }
 }
