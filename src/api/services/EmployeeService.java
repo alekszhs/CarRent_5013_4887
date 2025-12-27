@@ -4,6 +4,18 @@ import api.models.Employee;
 import java.util.List;
 import java.util.ArrayList;
 
+
+/**
+ * Handles all business logic related to employees.
+ * This service is responsible for managing employee records, including
+ * creation, validation, lookup, authentication, and removal.
+ * It enforces resources.data integrity rules such as unique usernames and emails,
+ * validates login credentials, and provides controlled access to the
+ * internal employee collection.
+ * This class acts as the central authority for employee-related operations
+ * and should be used by higher layers (e.g. controllers or UI) instead of
+ * accessing employee resources.data directly.
+ */
 public class EmployeeService {
     private final List<Employee> employees = new ArrayList<>();
 

@@ -3,89 +3,86 @@ package api.storage;
 import api.models.*;
 import api.services.*;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
- * Handles saving system data into CSV files.
- * Used when program closes OR when user manually chooses "Αποθήκευση".
- * Exports data generated/modified inside the application.
+ * Handles saving application data into CSV files.
+ * Data is written to a user-safe directory (outside resources).
  */
 public class FileStorage {
 
-    /**
-     * Saves all employees into CSV format.
-     * Format:
-     *   name,surname,username,email,password
-     *
-     * Writes fullName split into name + surname (requires 2 words!).
-     *
-     * @param path path to output CSV
-     * @param service employee source (EmployeeService)
-     */
-    public void saveEmployees(String path, EmployeeService service) throws IOException {
-        FileWriter fw = new FileWriter(path);
-        fw.write("name,surname,username,email,password\n");
+    // Base directory: ~/CarRent
+    private Path baseDir() throws IOException {
+        Path base = Paths.get(System.getProperty("user.home"), "CarRent");
+        Files.createDirectories(base);
+        return base;
+    }
 
-        for (Employee e : service.getAllEmployees()) {
-            String[] parts = e.getFullName().split(" "); // fullName -> split to first/last
-            fw.write(parts[0] + "," + parts[1] + "," + e.getUsername() + "," + e.getEmail() + "," + e.getPassword() + "\n");
-        }
-
-        fw.close();
+    private BufferedWriter writer(String filename) throws IOException {
+        Path file = baseDir().resolve(filename);
+        return Files.newBufferedWriter(file, StandardCharsets.UTF_8);
     }
 
     /**
-     * Saves all cars into vehicles.csv
-     * Format:
-     *   id,plate,brand,type,model,year,color,status
-     *
-     * Status is written as ENUM → AVAILABLE/RENTED (όχι ελληνικά)
-     *
-     * @param path path to CSV file
-     * @param service CarService containing car list
+     * Saves all employees into users.csv
+     * Format: name,surname,username,email,password
      */
-    public void saveCars(String path, CarService service) throws IOException {
-        FileWriter fw = new FileWriter(path);
-        fw.write("id,plate,brand,type,model,year,color,status\n");
+    public void saveEmployees(EmployeeService service) throws IOException {
+        try (BufferedWriter bw = writer("users.csv")) {
+            bw.write("name,surname,username,email,password\n");
 
-        for (Car c : service.getAllCars()) {
-            fw.write(
-                    c.getId() + "," + c.getPlate() + "," + c.getBrand() + "," +
-                            c.getType() + "," + c.getModel() + "," + c.getYear() + "," +
-                            c.getColor() + "," + c.getStatus() + "\n"
-            );
+            for (Employee e : service.getAllEmployees()) {
+                String[] parts = e.getFullName().trim().split("\\s+", 2);
+                String name = parts.length > 0 ? parts[0] : "";
+                String surname = parts.length > 1 ? parts[1] : "";
+                bw.write(name + "," + surname + "," +
+                        e.getUsername() + "," + e.getEmail() + "," + e.getPassword() + "\n");
+            }
         }
+    }
 
-        fw.close();
+    /**
+     * Saves all cars into vehicles_with_plates.csv
+     * Format: id,plate,brand,type,model,year,color,status
+     */
+    public void saveCars(CarService service) throws IOException {
+        try (BufferedWriter bw = writer("vehicles_with_plates.csv")) {
+            bw.write("id,plate,brand,type,model,year,color,status\n");
+
+            for (Car c : service.getAllCars()) {
+                bw.write(
+                        c.getId() + "," + c.getPlate() + "," + c.getBrand() + "," +
+                                c.getType() + "," + c.getModel() + "," + c.getYear() + "," +
+                                c.getColor() + "," + c.getStatus() + "\n"
+                );
+            }
+        }
     }
 
     /**
      * Saves all rentals into rentals.csv
-     * Format:
-     *   rentalId,carId,afm,username,startDate,endDate,status
-     *
-     * Includes:
-     *  - Car ID (όχι plate)
-     *  - Customer AFM
-     *  - Employee username
-     *  - Dates serialized as ISO (yyyy-MM-dd)
-     *
-     * @param path output file path
-     * @param service RentalService with rentals list
+     * Format: rentalId,carId,afm,username,startDate,endDate,status
      */
-    public void saveRentals(String path, RentalService service) throws IOException {
-        FileWriter fw = new FileWriter(path);
-        fw.write("rentalId,carId,afm,username,startDate,endDate,status\n");
+    public void saveRentals(RentalService service) throws IOException {
+        try (BufferedWriter bw = writer("rentals.csv")) {
+            bw.write("rentalId,carId,afm,username,startDate,endDate,status\n");
 
-        for (Rental r : service.getAllRentals()) {
-            fw.write(
-                    r.getRentalId() + "," + r.getCar().getId() + "," + r.getCustomer().getAfm() + "," +
-                            r.getEmployee().getUsername() + "," + r.getStartDate() + "," + r.getEndDate() + "," + r.getStatus()
-                            + "\n"
-            );
+            for (Rental r : service.getAllRentals()) {
+                bw.write(
+                        r.getRentalId() + "," +
+                                r.getCar().getId() + "," +
+                                r.getCustomer().getAfm() + "," +
+                                r.getEmployee().getUsername() + "," +
+                                r.getStartDate() + "," +
+                                r.getEndDate() + "," +
+                                r.getStatus() + "\n"
+                );
+            }
         }
-
-        fw.close();
     }
 }

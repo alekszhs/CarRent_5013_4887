@@ -18,7 +18,7 @@ public class CarService {
     private final List<Car> cars = new ArrayList<>();
 
     /**
-     * Adds a new car, ensuring unique id & license plate.
+     * Adds a new car, ensuring unique id & license plate + validation check.
      */
     public boolean addCar(Car car) {
 
@@ -56,6 +56,9 @@ public class CarService {
         if (id == null || id.isBlank() ){return null;}
 
         id = id.trim();
+        if (id.isEmpty()) {
+            return null;
+        }
 
         for (Car c : cars ){
             if (c.getId().equals(id)){
@@ -88,7 +91,7 @@ public class CarService {
     }
 
     /**
-     * Updates an existing car with new data.
+     * Updates an existing car with new resources.data.
      * Finds the car by its id, validates conflicts (e.g. license plate),
      * and updates all editable fields.
      *
@@ -204,18 +207,6 @@ public class CarService {
         return results;
     }
 
-    // η αυτο ,πρεπει να διαλεξουμε
-    /**
-     * public List<Car> searchCars(String brand, String plate, String model, String color, CarStatus status) {
-     *     return cars.stream()
-     *             .filter(c -> brand == null || brand.isBlank() || c.getBrand().equalsIgnoreCase(brand))
-     *             .filter(c -> plate == null || plate.isBlank() || c.getPlate().equalsIgnoreCase(plate))
-     *             .filter(c -> model == null || model.isBlank() || c.getModel().equalsIgnoreCase(model))
-     *             .filter(c -> color == null || color.isBlank() || c.getColor().equalsIgnoreCase(color))
-     *             .filter(c -> status == null || c.getStatus() == status)
-     *             .toList();
-     * }
-     */
 
 
 

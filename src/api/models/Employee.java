@@ -4,10 +4,8 @@ package api.models;
  * Represents an Employee of the rental company.
  * Employees are the only users allowed to log into the system.
  * Each employee has a unique username and a unique email.
- *
  * This class includes full validation in setters
  * and provides a convenience method for login matching.
- *
  * Author: Alexandros Gkourdoglou AM5013
  * Author: /--/ XXXX (fill later)
  */
@@ -92,7 +90,15 @@ public class Employee {
 
         email = email.trim();
 
-        // Basic email validation using regex (good enough for the assignment)
+        // Email Validation
+        //^ --> start of string
+        //[^@\\s] ---> No @ , No space , At least one character
+        //+@ --> @ after the string
+        //[^@\\s] ---> No @ , No space , At least one character
+        //+\\. a real dot
+        //[^@\\s] ---> No @ , No space , At least one character
+        //+$ --> end of string
+        //Example : alekszhs@gmail.com will pass    alek szhs@gmail.com will fail(space)
         if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
             throw new IllegalArgumentException("Invalid email format.");
 
@@ -136,7 +142,7 @@ public class Employee {
     }
 
 
-    // ==================== Utility Methods ====================
+    // ==================== ToString ====================
 
     /**
      * Returns a simple readable representation of the employee.
@@ -145,6 +151,8 @@ public class Employee {
     public String toString() {
         return fullName + " (" + username + ") - " + email;
     }
+
+    // ==================== Utility Methods ====================
 
     /**
      * Checks if given username & password match the employee's credentials.

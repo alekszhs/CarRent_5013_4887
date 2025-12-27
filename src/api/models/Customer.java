@@ -102,7 +102,15 @@ public class Customer {
 
         email = email.trim();
 
-        // Basic but correct email validation (not the weak version you had)
+        // Email Validation
+        //^ --> start of string
+        //[^@\\s] ---> No @ , No space , At least one character
+        //+@ --> @ after the string
+        //[^@\\s] ---> No @ , No space , At least one character
+        //+\\. a real dot
+        //[^@\\s] ---> No @ , No space , At least one character
+        //+$ --> end of string
+        //Example : alekszhs@gmail.com will pass    alek szhs@gmail.com will fail(space)
         if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
             throw new IllegalArgumentException("Invalid email format.");
 

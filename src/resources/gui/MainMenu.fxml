@@ -7,7 +7,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="gui.MainMenuController"
-            prefWidth="500" prefHeight="350">
+            prefWidth="500" prefHeight="380">
 
     <top>
         <Label text="Car Rental Management System"
@@ -18,6 +18,7 @@
         <VBox spacing="18" alignment="CENTER">
             <Button text="Manage Cars"      prefWidth="220" onAction="#openCars" />
             <Button text="Manage Customers" prefWidth="220" onAction="#openCustomers" />
+            <Button text="Manage Employees" prefWidth="220" onAction="#openEmployees" />
             <Button text="New Rental"       prefWidth="220" onAction="#openRentalForm" />
             <Button text="Return Rental" prefWidth="220" onAction="#openReturnRental"/>
             <Button text="Rental History"      prefWidth="220" onAction="#openHistory"/>

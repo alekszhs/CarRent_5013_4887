@@ -4,20 +4,32 @@ import api.models.*;
 import api.services.*;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 public class CsvLoader {
 
+    // helper: open CSV from resources safely
+    private BufferedReader openResourceCsv(String resourcePath) throws IOException {
+        InputStream in = CsvLoader.class.getResourceAsStream(resourcePath);
+        if (in == null) {
+            throw new IOException("Missing resource: " + resourcePath +
+                    " (Make sure it exists under resources and Resources Root is set)");
+        }
+        return new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+    }
+
     // =============================================================
     // EMPLOYEES
+    // resource: /data/users.csv
     // 1:name  2:surname  3:username  4:email  5:password
-    // Header παρακάμπτεται πάντα χωρίς να ενδιαφέρει τι γράφει
     // =============================================================
-    public void loadEmployees(String filePath, EmployeeService service) throws IOException {
+    public void loadEmployees(EmployeeService service) throws IOException {
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        try (BufferedReader br = openResourceCsv("/data/users.csv")) {
 
             br.readLine(); // IGNORE HEADER
 
@@ -39,15 +51,15 @@ public class CsvLoader {
         }
     }
 
-
     // =============================================================
     // CARS
+    // resource: /data/vehicles_with_plates.csv
     // 1:id  2:plate  3:brand  4:type  5:model  6:year  7:color  8:status
-    // status παίρνει "Διαθέσιμο" -> AVAILABLE  ή "Ενοικιασμένο" -> RENTED
+    // status: "Διαθέσιμο" -> AVAILABLE  else -> RENTED
     // =============================================================
-    public void loadCars(String filePath, CarService service) throws IOException {
+    public void loadCars(CarService service) throws IOException {
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        try (BufferedReader br = openResourceCsv("/data/vehicles_with_plates.csv")) {
 
             br.readLine(); // IGNORE HEADER
 
@@ -78,20 +90,19 @@ public class CsvLoader {
         }
     }
 
-
     // =============================================================
-    // RENTALS  (όταν φτιάξεις rentals.csv)
+    // RENTALS
+    // resource: /data/rentals.csv
     // 1:rentalId  2:carId  3:afm  4:username  5:start  6:end
     // =============================================================
     public void loadRentals(
-            String filePath,
             RentalService rentalService,
             CarService carService,
             CustomerService customerService,
             EmployeeService employeeService
     ) throws IOException {
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        try (BufferedReader br = openResourceCsv("/data/rentals.csv")) {
 
             br.readLine(); // IGNORE HEADER
 

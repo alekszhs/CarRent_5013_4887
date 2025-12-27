@@ -10,31 +10,28 @@ import java.util.Objects;
 
 public class Main extends Application {
 
-    private EmployeeService employeeService = new EmployeeService();
-    private CarService carService = new CarService();
-    private CustomerService customerService = new CustomerService();
-    private RentalService rentalService = new RentalService();
+    private final EmployeeService employeeService = new EmployeeService();
+    private final CarService carService = new CarService();
+    private final CustomerService customerService = new CustomerService();
+    private final RentalService rentalService = new RentalService();
 
-    private CsvLoader loader = new CsvLoader();
-    private FileStorage storage = new FileStorage();
-
+    private final CsvLoader loader = new CsvLoader();
+    private final FileStorage storage = new FileStorage();
 
     @Override
     public void start(Stage stage) throws Exception {
 
-        loader.loadEmployees("data/users.csv", employeeService);
-        loader.loadCars("data/vehicles_with_plates.csv", carService);
-        loader.loadRentals("data/rentals.csv", rentalService, carService, customerService, employeeService); // θα φτιαχτεί μετά
-
+        // Load from resources (NO file paths)
+        loader.loadEmployees(employeeService);
+        loader.loadCars(carService);
+        loader.loadRentals(rentalService, carService, customerService, employeeService);
 
         FXMLLoader fx = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
-
         Scene scene = new Scene(fx.load());
 
         scene.getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/gui/dark-theme.css")).toExternalForm()
         );
-
 
         gui.LoginController controller = fx.getController();
         controller.init(employeeService, carService, customerService, rentalService);
@@ -44,16 +41,16 @@ public class Main extends Application {
         stage.show();
     }
 
-
     @Override
     public void stop() {
         try {
-            storage.saveEmployees("data/users.csv", employeeService);
-            storage.saveCars("data/vehicles_with_plates.csv", carService);
-            storage.saveRentals("data/rentals.csv", rentalService);
-        } catch (Exception ignored) {}
+            // Save to user folder (NO file paths)
+            storage.saveEmployees(employeeService);
+            storage.saveCars(carService);
+            storage.saveRentals(rentalService);
+        } catch (Exception ignored) {
+        }
     }
-
 
     public static void main(String[] args) {
         launch();

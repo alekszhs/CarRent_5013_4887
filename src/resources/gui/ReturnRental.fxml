@@ -34,7 +34,7 @@
         <Button text="Search" onAction="#handleSearch"/>
     </HBox>
 
-    <TableView fx:id="tableActive" prefHeight="380">
+    <TableView fx:id="tableActive" prefHeight="350">
         <columns>
             <TableColumn fx:id="colId" text="Rental ID" prefWidth="100"/>
             <TableColumn fx:id="colPlate" text="Car Plate" prefWidth="120"/>

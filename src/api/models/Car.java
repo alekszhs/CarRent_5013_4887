@@ -7,8 +7,6 @@ package api.models;
  * brand, model, type, construction year, color, and current status
  * (AVAILABLE, RENTED, etc.).
  * </p>
- *
- * @version 1.1
  * @author Alexandros Gkourdoglou
  * @author /--/
  */

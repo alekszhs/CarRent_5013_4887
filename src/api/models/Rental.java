@@ -74,8 +74,6 @@ public class Rental {
         // New rentals always start as active
         this.status = RentalStatus.ACTIVE;
 
-        // Car becomes rented immediately
-        this.car.setStatus(CarStatus.RENTED);
     }
 
 

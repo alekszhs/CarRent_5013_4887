@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
@@ -37,6 +36,10 @@ public class CarFormController {
     @FXML private TextField txtYear;
     @FXML private TextField txtColor;
 
+    @FXML private TextField txtType;
+    @FXML private ComboBox<CarStatus> cmbStatus;
+
+
     @FXML private Label lblStatus;
 
     private CarService carService;
@@ -51,15 +54,35 @@ public class CarFormController {
                      CustomerService customerService,
                      RentalService rentalService,
                      Employee loggedEmployee) {
+
         this.employeeService = empService;
         this.carService = carService;
         this.customerService = customerService;
         this.rentalService = rentalService;
         this.loggedEmployee = loggedEmployee;
 
+        // status combo setup
+        cmbStatus.setItems(FXCollections.observableArrayList(CarStatus.values()));
+        cmbStatus.setValue(CarStatus.AVAILABLE);
 
+        // load table data
         loadTable();
+
+        // listener
+        tableCars.getSelectionModel().selectedItemProperty().addListener((obs, oldCar, newCar) -> {
+            if (newCar == null) return;
+
+            txtId.setText(newCar.getId());
+            txtPlate.setText(newCar.getPlate());
+            txtBrand.setText(newCar.getBrand());
+            txtModel.setText(newCar.getModel());
+            txtType.setText(newCar.getType());
+            txtYear.setText(String.valueOf(newCar.getYear()));
+            txtColor.setText(newCar.getColor());
+            cmbStatus.setValue(newCar.getStatus());
+        });
     }
+
 
 
 
@@ -81,50 +104,96 @@ public class CarFormController {
 
     // === ADD ===
     @FXML
-    public void handleAdd(){
-        try{
+    public void handleAdd() {
+        try {
             Car car = new Car(
                     txtId.getText(),
                     txtPlate.getText(),
                     txtBrand.getText(),
-                    "Type?",
                     txtModel.getText(),
+                    txtType.getText(),
                     Integer.parseInt(txtYear.getText()),
                     txtColor.getText(),
-                    CarStatus.AVAILABLE
+                    cmbStatus.getValue()
             );
 
-            if(carService.addCar(car)){
+            if (carService.addCar(car)) {
                 lblStatus.setText("Car added successfully.");
                 loadTable();
             } else {
-                lblStatus.setText("Car could not be added.");
+                lblStatus.setText("Car could not be added (duplicate ID or plate).");
             }
 
-        } catch (Exception e){
-            lblStatus.setText("Invalid input.");
+        } catch (Exception e) {
+            lblStatus.setText("Invalid input: " + e.getMessage());
         }
     }
+
 
 
     // === UPDATE ===
     @FXML
-    public void handleUpdate(){
+    public void handleUpdate() {
         Car selected = tableCars.getSelectionModel().getSelectedItem();
-        if(selected == null){
+        if (selected == null) {
             lblStatus.setText("Select a car first.");
             return;
         }
 
-        selected.setPlate(txtPlate.getText());
-        selected.setBrand(txtBrand.getText());
-        selected.setModel(txtModel.getText());
-        selected.setYear(Integer.parseInt(txtYear.getText()));
-        selected.setColor(txtColor.getText());
+        try {
+            Car newData = new Car(
+                    selected.getId(),              // id stays the same
+                    txtPlate.getText(),
+                    txtBrand.getText(),
+                    txtModel.getText(),
+                    txtType.getText(),
+                    Integer.parseInt(txtYear.getText()),
+                    txtColor.getText(),
+                    cmbStatus.getValue()
+            );
 
-        lblStatus.setText("Car updated successfully.");
-        loadTable();
+            carService.updateCar(selected.getId(), newData);
+
+            lblStatus.setText("Car updated successfully.");
+            loadTable();
+        } catch (Exception e) {
+            lblStatus.setText("Update failed: " + e.getMessage());
+        }
     }
+
+    // === SEARCH ===
+    @FXML
+    public void handleSearch() {
+        String brand = txtBrand.getText();
+        String plate = txtPlate.getText();
+        String model = txtModel.getText();
+        String color = txtColor.getText();
+        CarStatus status = cmbStatus.getValue(); // μπορεί να είναι null -> ignore στο service
+
+        var results = carService.searchCars(brand, plate, model, color, status);
+        tableCars.setItems(FXCollections.observableArrayList(results));
+
+        lblStatus.setText("Found " + results.size() + " car(s).");
+    }
+
+    // === CLEAR ===
+    @FXML
+    public void handleClear() {
+        txtId.clear();
+        txtPlate.clear();
+        txtBrand.clear();
+        txtModel.clear();
+        txtType.clear();
+        txtYear.clear();
+        txtColor.clear();
+
+        cmbStatus.setValue(null); // ώστε το search να αγνοεί status
+
+        loadTable();
+        lblStatus.setText("Filters cleared.");
+    }
+
+
 
 
     // === DELETE ===
@@ -144,7 +213,7 @@ public class CarFormController {
 
     @FXML
     public void goBack(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
         MainMenuController controller = loader.getController();
@@ -152,6 +221,9 @@ public class CarFormController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
+        stage.sizeToScene();
+
         stage.setTitle("Main Menu");
+
     }
 }

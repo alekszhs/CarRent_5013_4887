@@ -8,7 +8,6 @@ import api.services.RentalService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -35,7 +34,7 @@ public class MainMenuController {
 
     @FXML
     private void openCars(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("CarForm.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CarForm.fxml"));
         Parent root = loader.load();
 
         CarFormController controller = loader.getController();
@@ -51,7 +50,7 @@ public class MainMenuController {
 
     @FXML
     private void openCustomers(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("CustomerForm.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CustomerForm.fxml"));
         Parent root = loader.load();
 
         CustomerFormController controller = loader.getController();
@@ -65,8 +64,23 @@ public class MainMenuController {
     }
 
     @FXML
+    private void openEmployees(ActionEvent event) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/EmployeeForm.fxml"));
+        Parent root = loader.load();
+
+        EmployeeFormController controller = loader.getController();
+        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().setRoot(root);
+        stage.sizeToScene();
+        stage.setTitle("Manage Employees");
+    }
+
+
+    @FXML
     private void openRentalForm(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("RentalForm.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/RentalForm.fxml"));
         Parent root = loader.load();
 
         RentalFormController controller = loader.getController();
@@ -81,7 +95,7 @@ public class MainMenuController {
 
     @FXML
     private void openReturnRental(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("ReturnRental.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ReturnRental.fxml"));
         Parent root = loader.load();
 
         ReturnRentalController controller = loader.getController();
@@ -95,7 +109,7 @@ public class MainMenuController {
 
     @FXML
     private void openHistory(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("CustomerRentalHistory.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CustomerRentalHistory.fxml"));
         Parent root = loader.load();
 
         CustomerRentalHistoryController controller = loader.getController();
@@ -109,7 +123,7 @@ public class MainMenuController {
 
     @FXML
     private void logout(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
         Parent root = loader.load();
 
         LoginController controller = loader.getController();

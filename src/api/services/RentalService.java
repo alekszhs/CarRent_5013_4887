@@ -36,6 +36,8 @@ public class RentalService {
         if (rentalId == null || rentalId.isBlank())
             return null;
 
+        rentalId = rentalId.trim();
+
         for (Rental rental : rentals){
             if (rental.getRentalId().equalsIgnoreCase(rentalId)){
                 return rental;
@@ -88,7 +90,7 @@ public class RentalService {
     }
 
     /**
-     * Creates a new rental using raw data instead of a ready object.
+     * Creates a new rental using raw resources.data instead of a ready object.
      * Steps performed:
      *  - validate input
      *  - check availability & overlaps
@@ -177,6 +179,24 @@ public class RentalService {
         }
         return results;
     }
+
+    /**
+     * Returns all currently active rentals.
+     * An active rental is defined as a rental whose status is ACTIVE.
+     * These rentals correspond to cars that are currently rented and have not yet been returned.
+     * @return a list of active Rental objects.
+     *         The list is empty if there are no active rentals.
+     */
+    public List<Rental> getActiveRentals() {
+        List<Rental> results = new ArrayList<>();
+        for (Rental r : rentals) {
+            if (r.getStatus() == RentalStatus.ACTIVE) {
+                results.add(r);
+            }
+        }
+        return results;
+    }
+
 
     /**
      * Checks if rental ID already exists.

@@ -28,19 +28,28 @@
             </TableView>
 
             <HBox spacing="10">
-                <TextField fx:id="txtId"      promptText="ID"         prefWidth="80"/>
-                <TextField fx:id="txtPlate"   promptText="Plate"      prefWidth="120"/>
-                <TextField fx:id="txtBrand"   promptText="Brand"      prefWidth="120"/>
-                <TextField fx:id="txtModel"   promptText="Model"      prefWidth="120"/>
-                <TextField fx:id="txtYear"    promptText="Year"       prefWidth="80"/>
-                <TextField fx:id="txtColor"   promptText="Color"      prefWidth="100"/>
+                <TextField fx:id="txtId"      promptText="ID"    prefWidth="80"/>
+                <TextField fx:id="txtPlate"   promptText="Plate" prefWidth="120"/>
+                <TextField fx:id="txtBrand"   promptText="Brand" prefWidth="120"/>
+                <TextField fx:id="txtModel"   promptText="Model" prefWidth="120"/>
             </HBox>
 
-            <HBox spacing="10" alignment="CENTER">
-                <Button text="Add"    prefWidth="100" onAction="#handleAdd"/>
-                <Button text="Update" prefWidth="100" onAction="#handleUpdate"/>
-                <Button text="Delete" prefWidth="100" onAction="#handleDelete"/>
+            <HBox spacing="10">
+                <TextField fx:id="txtType"    promptText="Type"  prefWidth="120"/>
+                <TextField fx:id="txtYear"    promptText="Year"  prefWidth="80"/>
+                <TextField fx:id="txtColor"   promptText="Color" prefWidth="100"/>
+                <ComboBox fx:id="cmbStatus"   promptText="Status" prefWidth="120"/>
             </HBox>
+
+
+            <HBox spacing="10" alignment="CENTER">
+                <Button text="Add"    prefWidth="90" onAction="#handleAdd"/>
+                <Button text="Update" prefWidth="90" onAction="#handleUpdate"/>
+                <Button text="Delete" prefWidth="90" onAction="#handleDelete"/>
+                <Button text="Search" prefWidth="90" onAction="#handleSearch"/>
+                <Button text="Clear"  prefWidth="90" onAction="#handleClear"/>
+            </HBox>
+
 
             <Label fx:id="lblStatus" style="-fx-font-size:14; -fx-padding:5; -fx-text-fill:#444;"/>
         </VBox>

@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
 import api.models.Employee;
 import api.services.CustomerService;
 
@@ -53,7 +52,7 @@ public class CustomerFormController {
     }
 
 
-    // ================== Load data to table ==================
+    // ================== Load resources.data to table ==================
     private void loadTable(){
         ObservableList<Customer> list =
                 FXCollections.observableArrayList(customerService.getAllCustomers());
@@ -101,6 +100,32 @@ public class CustomerFormController {
         }
     }
 
+    // ================== SEARCH ==================
+    @FXML
+    public void handleSearch() {
+        String afm = txtAfm.getText();           // (θα είναι disabled, αλλά μπορεί να γεμίζει από click)
+        String fullName = txtFullName.getText();
+        String phone = txtPhone.getText();
+
+        var results = customerService.searchCustomers(afm, fullName, phone);
+        tableCustomers.setItems(FXCollections.observableArrayList(results));
+
+        lblStatus.setText("Found " + results.size() + " customer(s).");
+    }
+
+    // ================== CLEAR ==================
+    @FXML
+    public void handleClear() {
+        txtAfm.clear();
+        txtFullName.clear();
+        txtPhone.clear();
+        txtEmail.clear();
+
+        loadTable();
+        lblStatus.setText("Filters cleared.");
+    }
+
+
 
     // ================== Update ==================
     @FXML
@@ -112,11 +137,12 @@ public class CustomerFormController {
         }
 
         Customer newData = new Customer(
-                txtAfm.getText(),
+                selected.getAfm(),          // AFM stays the same
                 txtFullName.getText(),
                 txtPhone.getText(),
                 txtEmail.getText()
         );
+
 
         try{
             customerService.updateCustomer(selected.getAfm(), newData);
@@ -152,7 +178,7 @@ public class CustomerFormController {
     // ================== Back ==================
     @FXML
     public void goBack(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
         MainMenuController controller = loader.getController();
@@ -160,6 +186,8 @@ public class CustomerFormController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
+        stage.sizeToScene();
+
         stage.setTitle("Main Menu");
     }
 }

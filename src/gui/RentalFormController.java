@@ -17,10 +17,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
-import api.models.Employee;
 import api.services.EmployeeService;
-import api.services.CustomerService;
-import api.services.RentalService;
 
 import java.time.LocalDate;
 
@@ -52,10 +49,16 @@ public class RentalFormController {
         loadData();
     }
 
-    private void loadData(){
-        carBox.setItems(FXCollections.observableArrayList(carService.getAllCars()));
+    private void loadData() {
+        carBox.setItems(FXCollections.observableArrayList(
+                carService.getAllCars().stream()
+                        .filter(c -> c.getStatus() == api.models.CarStatus.AVAILABLE)
+                        .toList()
+        ));
+
         customerBox.setItems(FXCollections.observableArrayList(customerService.getAllCustomers()));
     }
+
 
     @FXML
     private void handleCreateRental(){
@@ -72,15 +75,22 @@ public class RentalFormController {
 
         boolean success = rentalService.rentCar(car, cust, loggedEmployee, start, end);
 
-        if(success)
+        if (success) {
             lblStatus.setText("Rental created successfully.");
-        else
+            carBox.setValue(null);
+            customerBox.setValue(null);
+            startDate.setValue(null);
+            endDate.setValue(null);
+            loadData(); // refresh AVAILABLE cars
+        } else {
             lblStatus.setText("Rental could not be created.");
+        }
+
     }
 
     @FXML
     public void goBack(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
         MainMenuController controller = loader.getController();
@@ -88,6 +98,9 @@ public class RentalFormController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
+
+        stage.sizeToScene();
+
         stage.setTitle("Main Menu");
     }
 }

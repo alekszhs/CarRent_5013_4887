@@ -28,17 +28,20 @@
 
             <!-- Input fields -->
             <HBox spacing="10" alignment="CENTER">
-                <TextField fx:id="txtAfm"       promptText="AFM"          prefWidth="120"/>
+                <TextField fx:id="txtAfm" promptText="AFM" prefWidth="120" disable="true"/>
                 <TextField fx:id="txtFullName"  promptText="Full Name"    prefWidth="180"/>
                 <TextField fx:id="txtPhone"     promptText="Phone Number" prefWidth="150"/>
                 <TextField fx:id="txtEmail"     promptText="Email"        prefWidth="200"/>
             </HBox>
 
             <HBox spacing="12" alignment="CENTER">
-                <Button text="Add"    prefWidth="100" onAction="#handleAdd"/>
-                <Button text="Update" prefWidth="100" onAction="#handleUpdate"/>
-                <Button text="Delete" prefWidth="100" onAction="#handleDelete"/>
+                <Button text="Add"    prefWidth="90" onAction="#handleAdd"/>
+                <Button text="Update" prefWidth="90" onAction="#handleUpdate"/>
+                <Button text="Delete" prefWidth="90" onAction="#handleDelete"/>
+                <Button text="Search" prefWidth="90" onAction="#handleSearch"/>
+                <Button text="Clear"  prefWidth="90" onAction="#handleClear"/>
             </HBox>
+
 
             <Label fx:id="lblStatus" style="-fx-font-size:14; -fx-padding:8;"/>
 

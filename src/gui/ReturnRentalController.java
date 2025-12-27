@@ -13,7 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-import javafx.event.ActionEvent;
 import api.models.Employee;
 import api.services.RentalService;
 
@@ -118,7 +117,7 @@ public class ReturnRentalController {
 
     @FXML
     public void goBack(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
         MainMenuController controller = loader.getController();
@@ -126,6 +125,8 @@ public class ReturnRentalController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
+        stage.sizeToScene();
+
         stage.setTitle("Main Menu");
     }
 }

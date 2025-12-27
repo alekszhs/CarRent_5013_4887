@@ -4,7 +4,7 @@ import api.models.Customer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 /**
  * Handles all business logic related to customers:
@@ -89,7 +89,7 @@ public class CustomerService {
      * Updates a customer's information.
      *
      * @param afm The AFM of the customer to update.
-     * @param newData The new data for the customer.
+     * @param newData The new resources.data for the customer.
      * @throws IllegalArgumentException if the AFM is invalid, customer not found,
      *                                  or if the new AFM conflicts with another customer.
      */
@@ -100,7 +100,7 @@ public class CustomerService {
         }
 
         if (newData == null) {
-            throw new IllegalArgumentException("New data cannot be null.");
+            throw new IllegalArgumentException("New resources.data cannot be null.");
         }
 
         afm = afm.trim();
