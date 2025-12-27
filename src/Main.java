@@ -21,34 +21,41 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        // Load from resources (NO file paths)
         loader.loadEmployees(employeeService);
         loader.loadCars(carService);
+        loader.loadCustomers(customerService);
         loader.loadRentals(rentalService, carService, customerService, employeeService);
 
-        FXMLLoader fx = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
+
+        FXMLLoader fx = new FXMLLoader(
+                getClass().getResource("/gui/Login.fxml")
+        );
+
         Scene scene = new Scene(fx.load());
 
         scene.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/gui/dark-theme.css")).toExternalForm()
+                Objects.requireNonNull(
+                        getClass().getResource("/gui/dark-theme.css")
+                ).toExternalForm()
         );
 
         gui.LoginController controller = fx.getController();
         controller.init(employeeService, carService, customerService, rentalService);
 
         stage.setScene(scene);
-        stage.setTitle("Car Rental System - Login");
+        stage.setTitle("Car Rental System");
         stage.show();
     }
 
     @Override
     public void stop() {
         try {
-            // Save to user folder (NO file paths)
             storage.saveEmployees(employeeService);
             storage.saveCars(carService);
+            storage.saveCustomers(customerService);
             storage.saveRentals(rentalService);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

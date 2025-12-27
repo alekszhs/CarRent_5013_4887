@@ -3,79 +3,88 @@ package api.storage;
 import api.models.*;
 import api.services.*;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 
-/**
- * Handles saving application data into CSV files.
- * Data is written to a user-safe directory (outside resources).
- */
 public class FileStorage {
 
-    // Base directory: ~/CarRent
-    private Path baseDir() throws IOException {
-        Path base = Paths.get(System.getProperty("user.home"), "CarRent");
-        Files.createDirectories(base);
-        return base;
+    private static final String BASE_DIR =
+            System.getProperty("user.home") + File.separator + "car-rental-data";
+
+    public FileStorage() {
+        new File(BASE_DIR).mkdirs();
     }
 
-    private BufferedWriter writer(String filename) throws IOException {
-        Path file = baseDir().resolve(filename);
-        return Files.newBufferedWriter(file, StandardCharsets.UTF_8);
+    private BufferedWriter writer(String fileName) throws IOException {
+        Path path = Paths.get(BASE_DIR, fileName);
+        return Files.newBufferedWriter(path);
     }
 
-    /**
-     * Saves all employees into users.csv
-     * Format: name,surname,username,email,password
-     */
+    /* ================= EMPLOYEES ================= */
+
     public void saveEmployees(EmployeeService service) throws IOException {
-        try (BufferedWriter bw = writer("users.csv")) {
-            bw.write("name,surname,username,email,password\n");
+        try (BufferedWriter bw = writer("employees.csv")) {
+            bw.write("fullName,username,email,password\n");
 
             for (Employee e : service.getAllEmployees()) {
-                String[] parts = e.getFullName().trim().split("\\s+", 2);
-                String name = parts.length > 0 ? parts[0] : "";
-                String surname = parts.length > 1 ? parts[1] : "";
-                bw.write(name + "," + surname + "," +
-                        e.getUsername() + "," + e.getEmail() + "," + e.getPassword() + "\n");
-            }
-        }
-    }
-
-    /**
-     * Saves all cars into vehicles_with_plates.csv
-     * Format: id,plate,brand,type,model,year,color,status
-     */
-    public void saveCars(CarService service) throws IOException {
-        try (BufferedWriter bw = writer("vehicles_with_plates.csv")) {
-            bw.write("id,plate,brand,type,model,year,color,status\n");
-
-            for (Car c : service.getAllCars()) {
                 bw.write(
-                        c.getId() + "," + c.getPlate() + "," + c.getBrand() + "," +
-                                c.getType() + "," + c.getModel() + "," + c.getYear() + "," +
-                                c.getColor() + "," + c.getStatus() + "\n"
+                        escape(e.getFullName()) + "," +
+                                escape(e.getUsername()) + "," +
+                                escape(e.getEmail()) + "," +
+                                escape(e.getPassword()) + "\n"
                 );
             }
         }
     }
 
-    /**
-     * Saves all rentals into rentals.csv
-     * Format: rentalId,carId,afm,username,startDate,endDate,status
-     */
+    /* ================= CARS ================= */
+
+    public void saveCars(CarService service) throws IOException {
+        try (BufferedWriter bw = writer("cars.csv")) {
+            bw.write("id,plate,brand,model,type,year,color,status\n");
+
+            for (Car c : service.getAllCars()) {
+                bw.write(
+                        c.getId() + "," +
+                                c.getPlate() + "," +
+                                c.getBrand() + "," +
+                                c.getModel() + "," +
+                                c.getType() + "," +
+                                c.getYear() + "," +
+                                c.getColor() + "," +
+                                c.getStatus() + "\n"
+                );
+            }
+        }
+    }
+
+    /* ================= CUSTOMERS ================= */
+
+    public void saveCustomers(CustomerService service) throws IOException {
+        try (BufferedWriter bw = writer("customers.csv")) {
+            bw.write("afm,fullName,phone,email\n");
+
+            for (Customer c : service.getAllCustomers()) {
+                bw.write(
+                        c.getAfm() + "," +
+                                escape(c.getFullName()) + "," +
+                                c.getPhoneNumber() + "," +
+                                c.getEmail() + "\n"
+                );
+            }
+        }
+    }
+
+    /* ================= RENTALS ================= */
+
     public void saveRentals(RentalService service) throws IOException {
         try (BufferedWriter bw = writer("rentals.csv")) {
-            bw.write("rentalId,carId,afm,username,startDate,endDate,status\n");
+            bw.write("rentalId,carPlate,customerAfm,employeeUsername,startDate,endDate,status\n");
 
             for (Rental r : service.getAllRentals()) {
                 bw.write(
                         r.getRentalId() + "," +
-                                r.getCar().getId() + "," +
+                                r.getCar().getPlate() + "," +
                                 r.getCustomer().getAfm() + "," +
                                 r.getEmployee().getUsername() + "," +
                                 r.getStartDate() + "," +
@@ -84,5 +93,12 @@ public class FileStorage {
                 );
             }
         }
+    }
+
+    /* ================= UTIL ================= */
+
+    private String escape(String s) {
+        if (s == null) return "";
+        return s.replace(",", " ");
     }
 }
