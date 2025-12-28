@@ -90,7 +90,7 @@ public class RentalService {
     }
 
     /**
-     * Creates a new rental using raw resources.data instead of a ready object.
+     * Creates a new rental using raw data instead of a ready object.
      * Steps performed:
      *  - validate input
      *  - check availability & overlaps

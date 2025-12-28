@@ -80,25 +80,84 @@ public class CustomerFormController {
     }
 
 
-    // ================== Add ==================
     @FXML
-    public void handleAdd(){
-        try{
-            Customer c = new Customer(
-                    txtAfm.getText(),
-                    txtFullName.getText(),
-                    txtPhone.getText(),
-                    txtEmail.getText()
-            );
+    public void handleAdd() {
+        try {
+            String afm = safe(txtAfm);
+            String fullName = safe(txtFullName);
+            String phone = safe(txtPhone);
+            String email = safe(txtEmail);
+
+            if (afm.isEmpty() || fullName.isEmpty() || phone.isEmpty() || email.isEmpty()) {
+                lblStatus.setText("Fill all required fields.");
+                return;
+            }
+            if (!afm.matches("\\d{9}")) {
+                lblStatus.setText("AFM must be exactly 9 digits.");
+                return;
+            }
+
+            Customer c = new Customer(afm, fullName, phone, email);
 
             customerService.addCustomer(c);
             lblStatus.setText("Customer added.");
             loadTable();
 
-        } catch (Exception e){
-            lblStatus.setText("Add failed.");
+        } catch (Exception e) {
+            lblStatus.setText("Add failed: " + e.getMessage());
         }
     }
+
+    @FXML
+    public void handleUpdate() {
+        Customer selected = tableCustomers.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            lblStatus.setText("Select a customer.");
+            return;
+        }
+
+        try {
+            String fullName = safe(txtFullName);
+            String phone = safe(txtPhone);
+            String email = safe(txtEmail);
+
+            if (fullName.isEmpty() || phone.isEmpty() || email.isEmpty()) {
+                lblStatus.setText("Fill all required fields.");
+                return;
+            }
+
+            Customer newData = new Customer(selected.getAfm(), fullName, phone, email);
+
+            customerService.updateCustomer(selected.getAfm(), newData);
+            lblStatus.setText("Customer updated.");
+            loadTable();
+
+        } catch (Exception e) {
+            lblStatus.setText("Update failed: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void handleDelete() {
+        Customer selected = tableCustomers.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            lblStatus.setText("Select a customer.");
+            return;
+        }
+
+        try {
+            customerService.deleteCustomer(selected.getAfm());
+            lblStatus.setText("Customer deleted.");
+            loadTable();
+        } catch (Exception e) {
+            lblStatus.setText("Delete failed: " + e.getMessage());
+        }
+    }
+
+    private String safe(TextField tf) {
+        return tf.getText() == null ? "" : tf.getText().trim();
+    }
+
 
     // ================== SEARCH ==================
     @FXML
@@ -123,55 +182,6 @@ public class CustomerFormController {
 
         loadTable();
         lblStatus.setText("Filters cleared.");
-    }
-
-
-
-    // ================== Update ==================
-    @FXML
-    public void handleUpdate(){
-        Customer selected = tableCustomers.getSelectionModel().getSelectedItem();
-        if(selected == null){
-            lblStatus.setText("Select a customer.");
-            return;
-        }
-
-        Customer newData = new Customer(
-                selected.getAfm(),          // AFM stays the same
-                txtFullName.getText(),
-                txtPhone.getText(),
-                txtEmail.getText()
-        );
-
-
-        try{
-            customerService.updateCustomer(selected.getAfm(), newData);
-            lblStatus.setText("Customer updated.");
-            loadTable();
-
-        } catch (Exception e){
-            lblStatus.setText("Update failed.");
-        }
-    }
-
-
-    // ================== Delete ==================
-    @FXML
-    public void handleDelete(){
-        Customer selected = tableCustomers.getSelectionModel().getSelectedItem();
-        if(selected == null){
-            lblStatus.setText("Select a customer.");
-            return;
-        }
-
-        try{
-            customerService.deleteCustomer(selected.getAfm());
-            lblStatus.setText("Customer deleted.");
-            loadTable();
-
-        } catch (Exception e){
-            lblStatus.setText("Delete failed.");
-        }
     }
 
 

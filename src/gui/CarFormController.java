@@ -106,30 +106,52 @@ public class CarFormController {
     @FXML
     public void handleAdd() {
         try {
-            Car car = new Car(
-                    txtId.getText(),
-                    txtPlate.getText(),
-                    txtBrand.getText(),
-                    txtModel.getText(),
-                    txtType.getText(),
-                    Integer.parseInt(txtYear.getText()),
-                    txtColor.getText(),
-                    cmbStatus.getValue()
-            );
+            String id = safe(txtId);
+            String plate = safe(txtPlate);
+            String brand = safe(txtBrand);
+            String model = safe(txtModel);
+            String type = safe(txtType);
+            String color = safe(txtColor);
+            CarStatus status = cmbStatus.getValue();
+
+            if (id.isEmpty() || plate.isEmpty() || brand.isEmpty() || model.isEmpty() || type.isEmpty() || color.isEmpty()) {
+                lblStatus.setText("Fill all required fields.");
+                return;
+            }
+            if (status == null) {
+                lblStatus.setText("Select a status.");
+                return;
+            }
+
+            int year;
+            try {
+                year = Integer.parseInt(safe(txtYear));
+            } catch (Exception ex) {
+                lblStatus.setText("Year must be a number.");
+                return;
+            }
+            int currentYear = java.time.LocalDate.now().getYear();
+            if (year < 1900 || year > currentYear + 1) {
+                lblStatus.setText("Invalid year.");
+                return;
+            }
+
+            Car car = new Car(id, plate, brand, model, type, year, color, status);
 
             if (carService.addCar(car)) {
                 lblStatus.setText("Car added successfully.");
                 loadTable();
+                tableCars.getSelectionModel().clearSelection();
             } else {
                 lblStatus.setText("Car could not be added (duplicate ID or plate).");
             }
 
+        } catch (IllegalArgumentException e) {
+            lblStatus.setText(e.getMessage());
         } catch (Exception e) {
-            lblStatus.setText("Invalid input: " + e.getMessage());
+            lblStatus.setText("Invalid input.");
         }
     }
-
-
 
     // === UPDATE ===
     @FXML
@@ -141,25 +163,74 @@ public class CarFormController {
         }
 
         try {
+            String plate = safe(txtPlate);
+            String brand = safe(txtBrand);
+            String model = safe(txtModel);
+            String type = safe(txtType);
+            String color = safe(txtColor);
+            CarStatus status = cmbStatus.getValue();
+
+            if (plate.isEmpty() || brand.isEmpty() || model.isEmpty() || type.isEmpty() || color.isEmpty()) {
+                lblStatus.setText("Fill all required fields.");
+                return;
+            }
+            if (status == null) {
+                lblStatus.setText("Select a status.");
+                return;
+            }
+
+            int year;
+            try {
+                year = Integer.parseInt(safe(txtYear));
+            } catch (Exception ex) {
+                lblStatus.setText("Year must be a number.");
+                return;
+            }
+
+            int currentYear = java.time.LocalDate.now().getYear();
+            if (year < 1900 || year > currentYear + 1) {
+                lblStatus.setText("Invalid year.");
+                return;
+            }
+
             Car newData = new Car(
-                    selected.getId(),              // id stays the same
-                    txtPlate.getText(),
-                    txtBrand.getText(),
-                    txtModel.getText(),
-                    txtType.getText(),
-                    Integer.parseInt(txtYear.getText()),
-                    txtColor.getText(),
-                    cmbStatus.getValue()
+                    selected.getId(), // id stays same
+                    plate, brand, model, type, year, color, status
             );
 
             carService.updateCar(selected.getId(), newData);
-
             lblStatus.setText("Car updated successfully.");
             loadTable();
-        } catch (Exception e) {
+
+        } catch (IllegalArgumentException e) {
             lblStatus.setText("Update failed: " + e.getMessage());
+        } catch (Exception e) {
+            lblStatus.setText("Update failed.");
         }
     }
+
+    // === DELETE ===
+    @FXML
+    public void handleDelete() {
+        Car selected = tableCars.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            lblStatus.setText("Select a car first.");
+            return;
+        }
+
+        try {
+            carService.deleteCar(selected.getId());
+            lblStatus.setText("Car deleted.");
+            loadTable();
+        } catch (Exception e) {
+            lblStatus.setText("Delete failed: " + e.getMessage());
+        }
+    }
+
+    private String safe(TextField tf) {
+        return tf.getText() == null ? "" : tf.getText().trim();
+    }
+
 
     // === SEARCH ===
     @FXML
@@ -193,22 +264,6 @@ public class CarFormController {
         lblStatus.setText("Filters cleared.");
     }
 
-
-
-
-    // === DELETE ===
-    @FXML
-    public void handleDelete(){
-        Car selected = tableCars.getSelectionModel().getSelectedItem();
-        if(selected == null){
-            lblStatus.setText("Select a car first.");
-            return;
-        }
-
-        carService.deleteCar(selected.getId());
-        lblStatus.setText("Car deleted.");
-        loadTable();
-    }
 
 
     @FXML

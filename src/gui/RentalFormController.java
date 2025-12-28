@@ -15,6 +15,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.scene.control.TextField;
+
 
 import javafx.event.ActionEvent;
 import api.services.EmployeeService;
@@ -28,6 +30,8 @@ public class RentalFormController {
     @FXML private DatePicker startDate;
     @FXML private DatePicker endDate;
     @FXML private Label lblStatus;
+    @FXML private TextField txtCustomerAfm;
+
 
     private CarService carService;
     private EmployeeService employeeService;
@@ -87,6 +91,33 @@ public class RentalFormController {
         }
 
     }
+
+    @FXML
+    private void handleFindCustomer() {
+        String afm = txtCustomerAfm.getText() == null ? "" : txtCustomerAfm.getText().trim();
+
+        if (afm.isBlank()) {
+            lblStatus.setText("Give AFM to search.");
+            return;
+        }
+
+        Customer found = customerService.findByAfm(afm);
+
+        if (found == null) {
+            lblStatus.setText("Customer not found.");
+            customerBox.setValue(null);
+            return;
+        }
+
+        // ensure it's in the combo list
+        if (!customerBox.getItems().contains(found)) {
+            customerBox.getItems().add(found);
+        }
+
+        customerBox.setValue(found);
+        lblStatus.setText("Customer selected: " + found.getFullName());
+    }
+
 
     @FXML
     public void goBack(ActionEvent event) throws Exception {

@@ -22,6 +22,11 @@
         <VBox spacing="5">
             <Label text="Customer"/>
             <ComboBox fx:id="customerBox" prefWidth="250"/>
+
+            <HBox spacing="10">
+                <TextField fx:id="txtCustomerAfm" promptText="Search AFM" prefWidth="150"/>
+                <Button text="Find" onAction="#handleFindCustomer"/>
+            </HBox>
         </VBox>
     </HBox>
 

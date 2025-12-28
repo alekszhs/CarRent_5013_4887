@@ -89,55 +89,42 @@ public class CustomerService {
      * Updates a customer's information.
      *
      * @param afm The AFM of the customer to update.
-     * @param newData The new resources.data for the customer.
+     * @param newData The new data for the customer.
      * @throws IllegalArgumentException if the AFM is invalid, customer not found,
      *                                  or if the new AFM conflicts with another customer.
      */
     public void updateCustomer(String afm, Customer newData) {
 
-        if (afm == null || afm.isBlank()) {
+        if (afm == null || afm.isBlank())
             throw new IllegalArgumentException("AFM cannot be empty.");
-        }
 
-        if (newData == null) {
-            throw new IllegalArgumentException("New resources.data cannot be null.");
-        }
+        if (newData == null)
+            throw new IllegalArgumentException("New data cannot be null.");
 
         afm = afm.trim();
 
         Customer existing = findByAfm(afm);
-        if (existing == null) {
+        if (existing == null)
             throw new IllegalArgumentException("Customer with AFM " + afm + " does not exist.");
-        }
 
-        // --- Check AFM conflict IF AFM is changed ---
-        String newAfm = newData.getAfm();
-        if (!afm.equals(newAfm)) {
-            Customer other = findByAfm(newAfm);
-            if (other != null && other != existing) {
-                throw new IllegalArgumentException("Another customer already uses this AFM.");
-            }
-        }
+        // AFM IS IMMUTABLE: do not allow change
+        if (newData.getAfm() == null || !afm.equals(newData.getAfm().trim()))
+            throw new IllegalArgumentException("AFM cannot be changed.");
 
-        // --- Validate new fields ---
-        if (newData.getFullName() == null || newData.getFullName().isBlank()) {
+        if (newData.getFullName() == null || newData.getFullName().isBlank())
             throw new IllegalArgumentException("Full name cannot be empty.");
-        }
 
-        if (newData.getPhoneNumber() == null || newData.getPhoneNumber().isBlank()) {
+        if (newData.getPhoneNumber() == null || newData.getPhoneNumber().isBlank())
             throw new IllegalArgumentException("Phone number cannot be empty.");
-        }
 
-        if (newData.getEmail() == null || newData.getEmail().isBlank()) {
+        if (newData.getEmail() == null || newData.getEmail().isBlank())
             throw new IllegalArgumentException("Email cannot be empty.");
-        }
 
-        // --- Update ---
-        existing.setAfm(newData.getAfm());
-        existing.setFullName(newData.getFullName());
-        existing.setPhoneNumber(newData.getPhoneNumber());
-        existing.setEmail(newData.getEmail());
+        existing.setFullName(newData.getFullName().trim());
+        existing.setPhoneNumber(newData.getPhoneNumber().trim());
+        existing.setEmail(newData.getEmail().trim());
     }
+
 
     /**
      * Deletes a customer from the system.

@@ -127,8 +127,10 @@ public class CsvLoader {
     // =============================================================
     // RENTALS
     // resource: /data/rentals.csv
-    // rentalId,carId,afm,username,start,end
-    // NOTE: workaround because your Rental constructor changes car status
+    // rentalId,carId,afm,username,startDate,endDate,status
+    //
+    // Loads rentals from CSV without applying business validations.
+    // Car availability is synchronized later based on ACTIVE rentals.
     // =============================================================
     public void loadRentals(
             RentalService rentalService,
@@ -144,8 +146,8 @@ public class CsvLoader {
             while ((line = br.readLine()) != null) {
                 if (line.isBlank()) continue;
 
-                String[] d = line.split(",");
-                if (d.length < 6) continue;
+                String[] d = line.split(",", -1);
+                if (d.length < 7) continue;
 
                 String rentalId = d[0].trim();
                 String carId    = d[1].trim();
@@ -154,29 +156,24 @@ public class CsvLoader {
                 LocalDate start = LocalDate.parse(d[4].trim());
                 LocalDate end   = LocalDate.parse(d[5].trim());
 
+                RentalStatus status;
+                try {
+                    status = RentalStatus.valueOf(d[6].trim());
+                } catch (Exception ex) {
+                    status = RentalStatus.ACTIVE;
+                }
+
                 Car car = carService.findById(carId);
                 Customer cust = customerService.findByAfm(afm);
                 Employee emp = employeeService.findByUsername(username);
 
-                // αν λείπει reference -> skip (αλλιώς θα σκάσει)
                 if (car == null || cust == null || emp == null) continue;
 
-                // IMPORTANT: το constructor σου κάνει car=RENTED,
-                // αλλά addRental απαιτεί AVAILABLE, άρα το “ισιώνουμε”
-                CarStatus prev = car.getStatus();
-                car.setStatus(CarStatus.AVAILABLE);
-
                 Rental rental = new Rental(rentalId, car, cust, emp, start, end);
+                rental.setStatus(status);
 
-                // ξανά AVAILABLE πριν addRental ώστε να περάσει ο έλεγχος
-                car.setStatus(CarStatus.AVAILABLE);
-
-                boolean ok = rentalService.addRental(rental);
-
-                // αν για κάποιο λόγο δεν μπήκε, επαναφέρουμε status
-                if (!ok) {
-                    car.setStatus(prev);
-                }
+                // Load “as-is” (χωρίς validations)
+                rentalService.getAllRentals().add(rental);
             }
         }
     }

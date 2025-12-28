@@ -101,33 +101,60 @@ public class CarService {
      *                                  or if the new plate conflicts with another car.
      */
     public void updateCar(String id, Car newData) {
-        // Find the existing car
-        Car existing = findById(id);
-        if (existing == null) {
-            throw new IllegalArgumentException("Car with id " + id + " does not exist.");
+
+        if (id == null || id.isBlank())
+            throw new IllegalArgumentException("Id cannot be null or empty.");
+
+        if (newData == null)
+            throw new IllegalArgumentException("New data cannot be null.");
+
+        // basic field validations (same philosophy as addCar)
+        if (newData.getPlate() == null || newData.getPlate().isBlank())
+            throw new IllegalArgumentException("Invalid license plate!");
+
+        if (newData.getBrand() == null || newData.getBrand().isBlank())
+            throw new IllegalArgumentException("Brand cannot be empty!");
+
+        if (newData.getModel() == null || newData.getModel().isBlank())
+            throw new IllegalArgumentException("Model cannot be empty!");
+
+        if (newData.getType() == null || newData.getType().isBlank())
+            throw new IllegalArgumentException("Type cannot be empty!");
+
+        int currentYear = java.time.LocalDate.now().getYear();
+        if (newData.getYear() < 1900 || newData.getYear() > currentYear) {
+            throw new IllegalArgumentException("Invalid manufacturing year: " + newData.getYear());
         }
 
-        // ---- License plate conflict check ----
-        // Only check if user changed the plate
+        if (newData.getColor() == null || newData.getColor().isBlank())
+            throw new IllegalArgumentException("Color cannot be empty!");
+
+        if (newData.getStatus() == null)
+            throw new IllegalArgumentException("Car status cannot be null!");
+
+        // Find existing
+        Car existing = findById(id.trim());
+        if (existing == null)
+            throw new IllegalArgumentException("Car with id " + id + " does not exist.");
+
+        // plate conflict check only if plate changed
         if (!existing.getPlate().equalsIgnoreCase(newData.getPlate())) {
-
             Car carWithSamePlate = findByPlate(newData.getPlate());
-
-            // If another car already has the new plate -> ERROR
             if (carWithSamePlate != null && carWithSamePlate != existing) {
                 throw new IllegalArgumentException("License plate already in use by another car.");
             }
         }
 
-        // ---- Update all fields ----
-        existing.setPlate(newData.getPlate());
-        existing.setBrand(newData.getBrand());
-        existing.setModel(newData.getModel());
-        existing.setType(newData.getType());
+        // Update fields
+        existing.setPlate(newData.getPlate().trim());
+        existing.setBrand(newData.getBrand().trim());
+        existing.setModel(newData.getModel().trim());
+        existing.setType(newData.getType().trim());
         existing.setYear(newData.getYear());
-        existing.setColor(newData.getColor());
+        existing.setColor(newData.getColor().trim());
         existing.setStatus(newData.getStatus());
     }
+
 
     /**
      * Deletes a car from the system by its id.

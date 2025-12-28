@@ -1,5 +1,7 @@
 package api.models;
 
+import api.models.CarStatus;
+
 import java.time.LocalDate;
 
 /**
@@ -73,7 +75,6 @@ public class Rental {
 
         // New rentals always start as active
         this.status = RentalStatus.ACTIVE;
-
     }
 
 
