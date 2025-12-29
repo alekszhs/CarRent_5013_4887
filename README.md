@@ -135,4 +135,4 @@ Initialization runs only once to preserve user changes.
 
 ## Team Contribution
 - Αλέξανδρος Γκούρδογλου
-- Θεμηστοκλής Κιουτσούκης
+- Θεμιστοκλής Κιουτσούκης
