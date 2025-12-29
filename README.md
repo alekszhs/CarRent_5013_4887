@@ -14,14 +14,56 @@ Includes CRUD operations, rental workflow (create/return), history viewing, logi
 - JavaFX SDK (included in `javafx/`)
 
 ### Steps (IntelliJ)
-1. Open IntelliJ IDEA → `File` → `Open` → select the project folder `CarRent_5013_XXXX`.
-2. Go to `File` → `Project Structure` → `Libraries` and ensure JavaFX is linked from:
-    - `javafx/lib`
-3. Go to `Run` → `Edit Configurations...` and set **VM options** to:
 
-```text
---module-path javafx/lib --add-modules javafx.controls,javafx.fxml
-```
+> ⚠️ This project does NOT use Maven or Gradle.
+> JavaFX is provided as a **local SDK**, so manual setup is required.
+
+1. **Open the project**
+    - Open IntelliJ IDEA
+    - `File` → `Open`
+    - Select the project folder `CarRent_5013_4887`
+
+2. **Mark resources folder (REQUIRED)**
+    - In the Project view, locate:
+      ```
+      src/resources
+      ```
+    - Right click → **Mark Directory as** → **Resources Root**
+
+   > If this step is skipped, the application may fail with  
+   > `IllegalStateException: Location is not set`.
+
+3. **Add JavaFX library (REQUIRED for compilation)**
+    - Go to `File` → `Project Structure` → `Libraries`
+    - Click `+` → **Java**
+    - Select the folder:
+      ```
+      javafx/lib
+      ```
+    - Apply / OK
+    - When prompted, add the library to module `CarRent_5013_4887`
+
+   > If this step is skipped, IntelliJ will show errors like  
+   > `package javafx.fxml does not exist`.
+
+4. **Configure Run Configuration (REQUIRED for runtime)**
+    - Go to `Run` → `Edit Configurations...`
+    - Create or select an **Application** configuration
+    - Set:
+        - **Main class:** `Main`
+        - **JDK:** Java 17
+    - Set **VM options** to:
+      ```text
+      --module-path javafx/lib --add-modules javafx.controls,javafx.fxml
+      ```
+    - Ensure **Working directory** points to the project root:
+      ```
+      CarRent_5013_XXXX
+      ```
+
+5. **Run**
+    - Run the configuration
+    - The JavaFX GUI should start normally
 
 4. Run the project from `Main.java`.
 
