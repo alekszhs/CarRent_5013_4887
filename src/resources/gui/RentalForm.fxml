@@ -2,50 +2,70 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.DatePicker?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="gui.RentalFormController"
-      prefWidth="500" prefHeight="350">
+      spacing="20"
+      alignment="CENTER"
+      style="-fx-padding: 20;"
+      prefWidth="900" prefHeight="600">
 
+    <!-- Title -->
+    <Label text="Create Rental"
+           style="-fx-font-size: 22; -fx-font-weight: bold;" />
 
-    <Label text="Create Rental" style="-fx-font-size:20; -fx-font-weight:bold"/>
+    <!-- Car + Customer Section -->
+    <HBox spacing="40" alignment="CENTER">
 
-    <HBox spacing="20">
-        <VBox spacing="5">
-            <Label text="Car"/>
-            <ComboBox fx:id="carBox" prefWidth="250"/>
+        <!-- Car Selection -->
+        <VBox spacing="8">
+            <Label text="Car" />
+            <ComboBox fx:id="carBox" prefWidth="250" />
         </VBox>
 
-        <VBox spacing="5">
-            <Label text="Customer"/>
-            <ComboBox fx:id="customerBox" prefWidth="250"/>
+        <!-- Customer Selection -->
+        <VBox spacing="8">
+            <Label text="Customer" />
+            <ComboBox fx:id="customerBox" prefWidth="250" />
 
             <HBox spacing="10">
-                <TextField fx:id="txtCustomerAfm" promptText="Search AFM" prefWidth="150"/>
-                <Button text="Find" onAction="#handleFindCustomer"/>
+                <TextField fx:id="txtCustomerAfm"
+                           promptText="Search AFM"
+                           prefWidth="150" />
+                <Button text="Find"
+                        onAction="#handleFindCustomer" />
             </HBox>
         </VBox>
+
     </HBox>
 
-    <HBox spacing="20">
-        <VBox spacing="5">
-            <Label text="Start Date"/>
+    <!-- Dates Section -->
+    <HBox spacing="40" alignment="CENTER">
+        <VBox spacing="8">
+            <Label text="Start Date" />
             <DatePicker fx:id="startDate" />
         </VBox>
-        <VBox spacing="5">
-            <Label text="End Date"/>
+
+        <VBox spacing="8">
+            <Label text="End Date" />
             <DatePicker fx:id="endDate" />
         </VBox>
     </HBox>
 
-    <Label fx:id="lblStatus" style="-fx-text-fill:red;"/>
+    <!-- Status Label -->
+    <Label fx:id="lblStatus"
+           style="-fx-font-size: 14; -fx-text-fill: #ff5555;" />
 
-    <HBox spacing="20">
-        <Button text="Create Rental" style="-fx-font-size:14" onAction="#handleCreateRental"/>
-        <Button text="Back" style="-fx-font-size:14" onAction="#goBack"/>
+    <!-- Action Buttons -->
+    <HBox spacing="20" alignment="CENTER">
+        <Button text="Create Rental"
+                style="-fx-font-size: 14;"
+                onAction="#handleCreateRental" />
+
+        <Button text="Back"
+                style="-fx-font-size: 14;"
+                onAction="#handleGoBack" />
     </HBox>
 
 </VBox>

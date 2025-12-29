@@ -4,41 +4,43 @@ import api.models.Employee;
 import java.util.List;
 import java.util.ArrayList;
 
-
 /**
- * Handles all business logic related to employees.
- * This service is responsible for managing employee records, including
- * creation, validation, lookup, authentication, and removal.
- * It enforces resources.data integrity rules such as unique usernames and emails,
- * validates login credentials, and provides controlled access to the
- * internal employee collection.
- * This class acts as the central authority for employee-related operations
- * and should be used by higher layers (e.g. controllers or UI) instead of
- * accessing employee resources.data directly.
+ * Provides business logic for managing employees in the rental system.
+ * <p>
+ * This service handles operations such as adding new employees, validating
+ * login credentials, searching by username or email, and removing employees.
+ * It enforces data integrity rules such as unique usernames and emails, and
+ * acts as the central authority for employee-related operations.
+ * </p>
+ *
+ * @author Αλέξανδρος Γκούρδογλου
+ * @author Θεμιστοκλής Κιουτσούκης
  */
 public class EmployeeService {
+
+    // ==================== Fields ====================
+
     private final List<Employee> employees = new ArrayList<>();
 
+
+    // ==================== Finders ====================
+
     /**
-     * Finds an employee by their username.
-     * <p>
-     * This method validates the input username and searches through the internal
-     * employee list for a matching username. Usernames are compared in a
-     * case-insensitive manner.
-     * </p>
+     * Finds an employee by their username (case-insensitive).
      *
-     * @param username the username of the employee to search for.
-     * @return the Employee object if found, otherwise null.
-     * @throws IllegalArgumentException if the provided username is null or blank.
+     * @param username the username to search for
+     * @return the matching employee, or null if not found
+     * @throws IllegalArgumentException if username is null or blank
      */
-    public Employee findByUsername(String username){
-        if (username == null || username.isBlank()){
+    public Employee findByUsername(String username) {
+        if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or empty.");
         }
+
         username = username.trim();
 
-        for (Employee employee : employees){
-            if (employee.getUsername().equalsIgnoreCase(username)){
+        for (Employee employee : employees) {
+            if (employee.getUsername().equalsIgnoreCase(username)) {
                 return employee;
             }
         }
@@ -46,141 +48,127 @@ public class EmployeeService {
     }
 
     /**
-     * Finds an employee by their email.
-     * <p>
-     * This method validates the input email and searches the internal
-     * employee list for a matching email. Comparison is case-insensitive.
-     * </p>
+     * Finds an employee by their email (case-insensitive).
      *
-     * @param email the email of the employee to search for.
-     * @return the Employee object if found, otherwise null.
-     * @throws IllegalArgumentException if the provided email is null or blank.
+     * @param email the email to search for
+     * @return the matching employee, or null if not found
+     * @throws IllegalArgumentException if email is null or blank
      */
-    public Employee findByEmail(String email){
-        if (email == null || email.isBlank()){
-            throw new IllegalArgumentException("email cannot be empty or null.");
+    public Employee findByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email cannot be empty or null.");
         }
 
         email = email.trim();
 
-        for (Employee employee : employees){
-            if(employee.getEmail().equalsIgnoreCase(email)){
+        for (Employee employee : employees) {
+            if (employee.getEmail().equalsIgnoreCase(email)) {
                 return employee;
             }
         }
         return null;
     }
 
+
+    // ==================== Add Employee ====================
+
     /**
      * Adds a new employee to the system.
-     * Ensures all fields are valid and username/email are unique.
+     * Ensures that username and email are unique and all fields are valid.
      *
      * @param emp the employee to add
      * @throws IllegalArgumentException if validation fails
      */
     public void addEmployee(Employee emp) {
 
-        // Null object check
-        if (emp == null) {
+        if (emp == null)
             throw new IllegalArgumentException("Employee cannot be null.");
-        }
 
         // Validate email
-        if (emp.getEmail() == null || emp.getEmail().isBlank()) {
+        if (emp.getEmail() == null || emp.getEmail().isBlank())
             throw new IllegalArgumentException("Email cannot be null or empty.");
-        }
+
         String email = emp.getEmail().trim();
-        if (findByEmail(email) != null) {
+        if (findByEmail(email) != null)
             throw new IllegalArgumentException("Email already exists!");
-        }
 
         // Validate username
-        if (emp.getUsername() == null || emp.getUsername().isBlank()) {
+        if (emp.getUsername() == null || emp.getUsername().isBlank())
             throw new IllegalArgumentException("Username cannot be null or empty.");
-        }
+
         String username = emp.getUsername().trim();
-        if (findByUsername(username) != null) {
+        if (findByUsername(username) != null)
             throw new IllegalArgumentException("Username already exists!");
-        }
 
         // Validate full name
-        if (emp.getFullName() == null || emp.getFullName().isBlank()) {
+        if (emp.getFullName() == null || emp.getFullName().isBlank())
             throw new IllegalArgumentException("Full name cannot be null or empty.");
-        }
 
-        // Validate password (no uniqueness needed)
-        if (emp.getPassword() == null || emp.getPassword().isBlank()) {
+        // Validate password
+        if (emp.getPassword() == null || emp.getPassword().isBlank())
             throw new IllegalArgumentException("Password cannot be null or empty.");
-        }
 
-        // If everything is valid → add employee
         employees.add(emp);
     }
 
+
+    // ==================== Login ====================
+
     /**
      * Validates employee login credentials.
-     * <p>
-     * This method checks that both username and password are valid,
-     * finds the employee by username, and verifies that the stored
-     * password matches exactly.
-     * </p>
      *
-     * @param username the username provided by the user
-     * @param password the password provided by the user
+     * @param username the username provided
+     * @param password the password provided
      * @return true if login is successful, false otherwise
      * @throws IllegalArgumentException if username or password are null/blank
      */
     public boolean validateLogin(String username, String password) {
 
-        if (username == null || username.isBlank()) {
+        if (username == null || username.isBlank())
             throw new IllegalArgumentException("Username cannot be null or empty.");
-        }
 
-        if (password == null || password.isBlank()) {
+        if (password == null || password.isBlank())
             throw new IllegalArgumentException("Password cannot be null or empty.");
-        }
 
         username = username.trim();
         password = password.trim();
 
-        // Find employee once (efficient)
         Employee emp = findByUsername(username);
-        if (emp == null) {
-            return false; // no such user
-        }
+        if (emp == null)
+            return false;
 
-        // Correct password
         return emp.getPassword().equals(password);
     }
 
+
+    // ==================== Delete Employee ====================
+
     /**
-     * Deletes an employee from the list.
+     * Deletes an employee from the system.
      *
-     * @param emp The employee object to delete. Cannot be null.
-     * @throws IllegalArgumentException If the provided employee is null.
-     * @throws IllegalStateException    If the employee does not exist in the list.
+     * @param emp the employee to delete
+     * @throws IllegalArgumentException if emp is null
+     * @throws IllegalStateException if the employee does not exist
      */
     public void deleteEmployee(Employee emp) {
-        if (emp == null) {
-            // Validation: you cannot delete a null employee reference
+        if (emp == null)
             throw new IllegalArgumentException("Employee cannot be null.");
-        }
 
-        // remove(emp) returns true if the employee existed and was removed
         boolean removed = employees.remove(emp);
 
-        if (!removed) {
-            // Removal failed → the employee was not found in the list
+        if (!removed)
             throw new IllegalStateException("Employee not found in list.");
-        }
     }
 
+
+    // ==================== Getters ====================
+
     /**
-     * Returns a full list of all registered employees.
+     * Returns all registered employees.
      *
-     * @return A List containing all Employee objects.
+     * @return a copy of the employee list
      */
     public List<Employee> getAllEmployees() {
-        return employees; // Direct reference (mutable list)
+        return new ArrayList<>(employees);
     }
 }

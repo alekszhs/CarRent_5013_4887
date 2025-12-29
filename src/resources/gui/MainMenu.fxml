@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -9,20 +8,44 @@
             fx:controller="gui.MainMenuController"
             prefWidth="500" prefHeight="380">
 
+    <!-- Title -->
     <top>
         <Label text="Car Rental Management System"
                style="-fx-font-size: 22; -fx-font-weight: bold; -fx-padding: 15;" />
     </top>
 
+    <!-- Menu Buttons -->
     <center>
         <VBox spacing="18" alignment="CENTER">
-            <Button text="Manage Cars"      prefWidth="220" onAction="#openCars" />
-            <Button text="Manage Customers" prefWidth="220" onAction="#openCustomers" />
-            <Button text="Manage Employees" prefWidth="220" onAction="#openEmployees" />
-            <Button text="New Rental"       prefWidth="220" onAction="#openRentalForm" />
-            <Button text="Return Rental" prefWidth="220" onAction="#openReturnRental"/>
-            <Button text="Rental History"      prefWidth="220" onAction="#openHistory"/>
-            <Button text="Logout"           prefWidth="220" onAction="#logout" />
+
+            <Button text="Manage Cars"
+                    prefWidth="220"
+                    onAction="#handleOpenCars"/>
+
+            <Button text="Manage Customers"
+                    prefWidth="220"
+                    onAction="#handleOpenCustomers"/>
+
+            <Button text="Manage Employees"
+                    prefWidth="220"
+                    onAction="#handleOpenEmployees"/>
+
+            <Button text="New Rental"
+                    prefWidth="220"
+                    onAction="#handleOpenRentalForm"/>
+
+            <Button text="Return Rental"
+                    prefWidth="220"
+                    onAction="#handleOpenReturnRental"/>
+
+            <Button text="Rental History"
+                    prefWidth="220"
+                    onAction="#handleOpenHistory"/>
+
+            <Button text="Logout"
+                    prefWidth="220"
+                    onAction="#handleLogout"/>
+
         </VBox>
     </center>
 

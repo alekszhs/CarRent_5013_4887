@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="gui.CustomerRentalHistoryController"
-            prefWidth="500" prefHeight="350">
+            prefWidth="900" prefHeight="600">
 
+    <!-- Top Section -->
     <top>
         <VBox spacing="10" style="-fx-padding: 15;">
-            <Label text="Rental History" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+            <Label text="Rental History"
+                   style="-fx-font-size: 22; -fx-font-weight: bold;" />
 
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Customer AFM:"/>
@@ -21,29 +22,36 @@
                 <TextField fx:id="txtPlate" prefWidth="120"/>
 
                 <Button text="Search" onAction="#handleSearch"/>
-                <Button text="Clear" onAction="#handleClear"/>
+                <Button text="Clear"  onAction="#handleClear"/>
             </HBox>
         </VBox>
     </top>
 
+    <!-- Table -->
     <center>
-        <TableView fx:id="tableResults">
+        <TableView fx:id="tableResults" prefWidth="850" prefHeight="400">
             <columns>
-                <TableColumn fx:id="colId" text="Rental ID" prefWidth="90"/>
-                <TableColumn fx:id="colPlate" text="Car Plate" prefWidth="100"/>
-                <TableColumn fx:id="colAfm" text="AFM" prefWidth="110"/>
-                <TableColumn fx:id="colStart" text="From" prefWidth="130"/>
-                <TableColumn fx:id="colEnd" text="To" prefWidth="130"/>
-                <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
+                <TableColumn fx:id="colId"     text="Rental ID" prefWidth="90"/>
+                <TableColumn fx:id="colPlate"  text="Car Plate" prefWidth="100"/>
+                <TableColumn fx:id="colAfm"    text="AFM"       prefWidth="110"/>
+                <TableColumn fx:id="colStart"  text="From"      prefWidth="130"/>
+                <TableColumn fx:id="colEnd"    text="To"        prefWidth="130"/>
+                <TableColumn fx:id="colStatus" text="Status"    prefWidth="90"/>
             </columns>
         </TableView>
     </center>
 
+    <!-- Bottom Section -->
     <bottom>
-        <Label fx:id="lblStatus" style="-fx-padding: 10; -fx-font-size: 14;"/>
-        <Button text="Back"
-                prefWidth="100"
-                style="-fx-padding:10; -fx-font-size:14;"
-                onAction="#goBack"/>
+        <VBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
+            <Label fx:id="lblStatus"
+                   style="-fx-font-size: 14; -fx-text-fill: #ff5555;" />
+
+            <Button text="Back"
+                    prefWidth="120"
+                    style="-fx-font-size: 14;"
+                    onAction="#handleGoBack"/>
+        </VBox>
     </bottom>
+
 </BorderPane>

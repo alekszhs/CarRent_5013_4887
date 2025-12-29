@@ -1,7 +1,5 @@
 package api.models;
 
-import api.models.CarStatus;
-
 import java.time.LocalDate;
 
 /**
@@ -9,8 +7,11 @@ import java.time.LocalDate;
  * <p>
  * Each rental has a unique rental ID, refers to one car and one customer,
  * stores the employee handling the process, and includes start/end dates.
- * Rentals start as ACTIVE and can later be completed.
+ * Rentals always begin as ACTIVE and may later be completed.
  * </p>
+ *
+ * @author Αλέξανδρος Γκούρδογλου
+ * @author Θεμιστοκλής Κιουτσούκης
  */
 public class Rental {
 
@@ -30,42 +31,33 @@ public class Rental {
     /**
      * Creates a Rental object.
      *
-     * @param rentalId unique rental identifier
-     * @param car the rented car
-     * @param customer the customer renting the car
-     * @param employee the employee responsible for the rental
+     * @param rentalId  unique rental identifier
+     * @param car       the rented car
+     * @param customer  the customer renting the car
+     * @param employee  the employee responsible for the rental
      * @param startDate rental start date
-     * @param endDate rental end date
+     * @param endDate   rental end date
      *
      * @throws IllegalArgumentException if any parameter is invalid
      */
     public Rental(String rentalId, Car car, Customer customer, Employee employee,
                   LocalDate startDate, LocalDate endDate) {
 
-        // Validate required fields
         if (rentalId == null || rentalId.isBlank())
             throw new IllegalArgumentException("Rental ID cannot be null or empty.");
-
         if (car == null)
             throw new IllegalArgumentException("Car cannot be null.");
-
         if (customer == null)
             throw new IllegalArgumentException("Customer cannot be null.");
-
         if (employee == null)
             throw new IllegalArgumentException("Employee cannot be null.");
-
         if (startDate == null)
             throw new IllegalArgumentException("Start date cannot be null.");
-
         if (endDate == null)
             throw new IllegalArgumentException("End date cannot be null.");
-
-        // Validate date order
         if (endDate.isBefore(startDate))
             throw new IllegalArgumentException("End date cannot be before start date.");
 
-        // Assign fields
         this.rentalId = rentalId.trim();
         this.car = car;
         this.customer = customer;
@@ -73,34 +65,33 @@ public class Rental {
         this.startDate = startDate;
         this.endDate = endDate;
 
-        // New rentals always start as active
         this.status = RentalStatus.ACTIVE;
     }
 
 
     // ==================== Getters ====================
 
-    public String getRentalId()  { return rentalId; }
-    public Car getCar()          { return car; }
-    public Customer getCustomer(){ return customer; }
-    public Employee getEmployee(){ return employee; }
-    public LocalDate getStartDate(){ return startDate; }
-    public LocalDate getEndDate()  { return endDate; }
-    public RentalStatus getStatus(){ return status; }
+    public String getRentalId()     { return rentalId; }
+    public Car getCar()             { return car; }
+    public Customer getCustomer()   { return customer; }
+    public Employee getEmployee()   { return employee; }
+    public LocalDate getStartDate() { return startDate; }
+    public LocalDate getEndDate()   { return endDate; }
+    public RentalStatus getStatus() { return status; }
 
 
     // ==================== Setters ====================
 
     /**
      * Updates the end date of the rental.
-     * The new end date must still be >= start date.
+     * The new end date must be on or after the start date.
      *
      * @param endDate the new end date
+     * @throws IllegalArgumentException if the date is null or before the start date
      */
     public void setEndDate(LocalDate endDate) {
         if (endDate == null)
             throw new IllegalArgumentException("End date cannot be null.");
-
         if (endDate.isBefore(startDate))
             throw new IllegalArgumentException("End date cannot be earlier than start date.");
 
@@ -108,14 +99,14 @@ public class Rental {
     }
 
     /**
-     * Sets the rental status (ACTIVE or COMPLETED)
+     * Sets the rental status (ACTIVE or COMPLETED).
      *
      * @param status the new rental status
+     * @throws IllegalArgumentException if status is null
      */
     public void setStatus(RentalStatus status) {
         if (status == null)
             throw new IllegalArgumentException("Rental status cannot be null.");
-
         this.status = status;
     }
 
@@ -135,6 +126,9 @@ public class Rental {
 
     /**
      * Rentals are equal if they share the same rental ID.
+     *
+     * @param o the object to compare
+     * @return true if rental IDs match, false otherwise
      */
     @Override
     public boolean equals(Object o) {
@@ -154,6 +148,8 @@ public class Rental {
 
     /**
      * Returns a readable representation of the rental.
+     *
+     * @return formatted rental information
      */
     @Override
     public String toString() {

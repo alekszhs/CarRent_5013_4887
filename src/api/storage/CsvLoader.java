@@ -10,26 +10,72 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
+/**
+ * Utility class responsible for loading application data from CSV files
+ * located inside the resources folder.
+ * <p>
+ * This loader initializes employees, customers, cars, and rentals by reading
+ * predefined CSV files. It is typically used during application startup to
+ * populate the service layer with initial data.
+ * </p>
+ *
+ * <p><b>Important:</b> All CSV files must be placed under <code>src/main/resources/data</code>
+ * and the folder must be marked as a Resources Root in IntelliJ.</p>
+ *
+ * <p>
+ * The loader performs minimal validation and delegates business rules to the
+ * corresponding service classes. Rentals are imported "as-is" and their
+ * business logic (e.g., availability synchronization) is handled later.
+ * </p>
+ *
+ * @author
+ *     Αλέξανδρος Γκούρδογλου,
+ *     Θεμιστοκλής Κιουτσούκης
+ */
 public class CsvLoader {
 
-    // helper: open CSV from resources safely
+    // ==================== Utility: Open CSV Resource ====================
+
+    /**
+     * Opens a CSV file located inside the resources folder and returns a
+     * {@link BufferedReader} for reading its contents.
+     *
+     * @param resourcePath the path to the CSV file inside the resources folder
+     * @return a BufferedReader for reading the file
+     * @throws IOException if the resource cannot be found or opened
+     */
     private BufferedReader openResourceCsv(String resourcePath) throws IOException {
         InputStream in = CsvLoader.class.getResourceAsStream(resourcePath);
+
         if (in == null) {
-            throw new IOException("Missing resource: " + resourcePath +
-                    " (Make sure it exists under src/resources and Resources Root is set)");
+            throw new IOException(
+                    "Resource not found: " + resourcePath +
+                            " (Ensure it exists under src/main/resources and is marked as Resources Root)"
+            );
         }
+
         return new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
     }
 
-    // =============================================================
-    // EMPLOYEES
-    // resource: /data/users.csv
-    // name,surname,username,email,password
-    // =============================================================
+
+    // ==================== Load Employees ====================
+
+    /**
+     * Loads employees from <code>data/users.csv</code>.
+     * <p>
+     * Expected format:
+     * <pre>
+     * name,surname,username,email,password
+     * </pre>
+     * </p>
+     *
+     * @param service the EmployeeService to populate
+     * @throws IOException if the CSV file cannot be read
+     */
     public void loadEmployees(EmployeeService service) throws IOException {
         try (BufferedReader br = openResourceCsv("/data/users.csv")) {
-            br.readLine(); // header
+
+            br.readLine(); // skip header
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -39,10 +85,10 @@ public class CsvLoader {
                 if (d.length < 5) continue;
 
                 Employee e = new Employee(
-                        d[0].trim() + " " + d[1].trim(),
-                        d[2].trim(),
-                        d[3].trim(),
-                        d[4].trim()
+                        d[0].trim() + " " + d[1].trim(), // full name
+                        d[2].trim(),                     // username
+                        d[3].trim(),                     // email
+                        d[4].trim()                      // password
                 );
 
                 service.addEmployee(e);
@@ -50,21 +96,30 @@ public class CsvLoader {
         }
     }
 
-    // =============================================================
-    // CUSTOMERS
-    // resource: /data/customers.csv
-    // afm,fullName,phone,email
-    // =============================================================
 
-    // “σαν τα άλλα”: χωρίς filePath
+    // ==================== Load Customers ====================
+
+    /**
+     * Loads customers from the default CSV file <code>data/customers.csv</code>.
+     *
+     * @param service the CustomerService to populate
+     * @throws IOException if the CSV file cannot be read
+     */
     public void loadCustomers(CustomerService service) throws IOException {
         loadCustomersFromResources("/data/customers.csv", service);
     }
 
-    // αν θες να δώσεις άλλο resource path
+    /**
+     * Loads customers from a custom CSV resource path.
+     *
+     * @param resourcePath the path to the CSV file
+     * @param service      the CustomerService to populate
+     * @throws IOException if the CSV file cannot be read
+     */
     public void loadCustomersFromResources(String resourcePath, CustomerService service) throws IOException {
         try (BufferedReader br = openResourceCsv(resourcePath)) {
-            br.readLine(); // header
+
+            br.readLine(); // skip header
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -74,10 +129,10 @@ public class CsvLoader {
                 if (d.length < 4) continue;
 
                 Customer c = new Customer(
-                        d[0].trim(),
-                        d[1].trim(),
-                        d[2].trim(),
-                        d[3].trim()
+                        d[0].trim(), // afm
+                        d[1].trim(), // full name
+                        d[2].trim(), // phone
+                        d[3].trim()  // email
                 );
 
                 service.addCustomer(c);
@@ -85,15 +140,29 @@ public class CsvLoader {
         }
     }
 
-    // =============================================================
-    // CARS
-    // resource: /data/vehicles_with_plates.csv
-    // id,plate,brand,type,model,year,color,status
-    // status: "Διαθέσιμο" -> AVAILABLE  else -> RENTED
-    // =============================================================
+
+    // ==================== Load Cars ====================
+
+    /**
+     * Loads cars from <code>data/vehicles_with_plates.csv</code>.
+     * <p>
+     * Expected format:
+     * <pre>
+     * id,plate,brand,type,model,year,color,status
+     * </pre>
+     * Status is interpreted as:
+     * <ul>
+     *     <li>"Διαθέσιμο" → AVAILABLE</li>
+     *     <li>anything else → RENTED</li>
+     * </ul>
+     *
+     * @param service the CarService to populate
+     * @throws IOException if the CSV file cannot be read
+     */
     public void loadCars(CarService service) throws IOException {
         try (BufferedReader br = openResourceCsv("/data/vehicles_with_plates.csv")) {
-            br.readLine(); // header
+
+            br.readLine(); // skip header
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -103,19 +172,18 @@ public class CsvLoader {
                 if (d.length < 8) continue;
 
                 CarStatus status =
-                        d[7].trim().equalsIgnoreCase("Διαθέσιμο") ?
-                                CarStatus.AVAILABLE :
-                                CarStatus.RENTED;
+                        d[7].trim().equalsIgnoreCase("Διαθέσιμο")
+                                ? CarStatus.AVAILABLE
+                                : CarStatus.RENTED;
 
-                // ΣΩΣΤΗ αντιστοίχιση: brand=d[2], type=d[3], model=d[4]
                 Car car = new Car(
-                        d[0].trim(),                 // id
-                        d[1].trim(),                 // plate
-                        d[2].trim(),                 // brand
-                        d[4].trim(),                 // model  (FIX)
-                        d[3].trim(),                 // type   (FIX)
-                        Integer.parseInt(d[5].trim()),// year
-                        d[6].trim(),                 // color
+                        d[0].trim(),                   // id
+                        d[1].trim(),                   // plate
+                        d[2].trim(),                   // brand
+                        d[4].trim(),                   // model
+                        d[3].trim(),                   // type
+                        Integer.parseInt(d[5].trim()), // year
+                        d[6].trim(),                   // color
                         status
                 );
 
@@ -124,14 +192,30 @@ public class CsvLoader {
         }
     }
 
-    // =============================================================
-    // RENTALS
-    // resource: /data/rentals.csv
-    // rentalId,carId,afm,username,startDate,endDate,status
-    //
-    // Loads rentals from CSV without applying business validations.
-    // Car availability is synchronized later based on ACTIVE rentals.
-    // =============================================================
+
+    // ==================== Load Rentals ====================
+
+    /**
+     * Loads rentals from <code>data/rentals.csv</code>.
+     * <p>
+     * Expected format:
+     * <pre>
+     * rentalId,carId,afm,username,startDate,endDate,status
+     * </pre>
+     * </p>
+     *
+     * <p>
+     * Rentals are imported <b>without applying business rules</b>.
+     * After loading, the system should synchronize car availability
+     * based on ACTIVE rentals.
+     * </p>
+     *
+     * @param rentalService   the RentalService to populate
+     * @param carService      used to resolve car references
+     * @param customerService used to resolve customer references
+     * @param employeeService used to resolve employee references
+     * @throws IOException if the CSV file cannot be read
+     */
     public void loadRentals(
             RentalService rentalService,
             CarService carService,
@@ -140,7 +224,8 @@ public class CsvLoader {
     ) throws IOException {
 
         try (BufferedReader br = openResourceCsv("/data/rentals.csv")) {
-            br.readLine(); // header
+
+            br.readLine(); // skip header
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -160,19 +245,20 @@ public class CsvLoader {
                 try {
                     status = RentalStatus.valueOf(d[6].trim());
                 } catch (Exception ex) {
-                    status = RentalStatus.ACTIVE;
+                    status = RentalStatus.ACTIVE; // fallback
                 }
 
                 Car car = carService.findById(carId);
                 Customer cust = customerService.findByAfm(afm);
                 Employee emp = employeeService.findByUsername(username);
 
-                if (car == null || cust == null || emp == null) continue;
+                if (car == null || cust == null || emp == null)
+                    continue;
 
                 Rental rental = new Rental(rentalId, car, cust, emp, start, end);
                 rental.setStatus(status);
 
-                // Load “as-is” (χωρίς validations)
+                // Raw import (no business validation)
                 rentalService.getAllRentals().add(rental);
             }
         }

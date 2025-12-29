@@ -3,27 +3,29 @@ package gui;
 import api.models.Car;
 import api.models.Customer;
 import api.models.Employee;
+import api.models.CarStatus;
+
 import api.services.CarService;
 import api.services.CustomerService;
+import api.services.EmployeeService;
 import api.services.RentalService;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.scene.control.TextField;
-
-
 import javafx.event.ActionEvent;
-import api.services.EmployeeService;
 
 import java.time.LocalDate;
 
 public class RentalFormController {
+
+    // ---------------------------------------------------------
+    // FXML UI Components
+    // ---------------------------------------------------------
 
     @FXML private ComboBox<Car> carBox;
     @FXML private ComboBox<Customer> customerBox;
@@ -32,6 +34,9 @@ public class RentalFormController {
     @FXML private Label lblStatus;
     @FXML private TextField txtCustomerAfm;
 
+    // ---------------------------------------------------------
+    // Services + Logged Employee
+    // ---------------------------------------------------------
 
     private CarService carService;
     private EmployeeService employeeService;
@@ -39,11 +44,16 @@ public class RentalFormController {
     private RentalService rentalService;
     private Employee loggedEmployee;
 
+    // ---------------------------------------------------------
+    // Dependency Injection (called from MainMenu)
+    // ---------------------------------------------------------
+
     public void init(EmployeeService empService,
                      CarService carService,
                      CustomerService customerService,
                      RentalService rentalService,
                      Employee loggedEmployee) {
+
         this.employeeService = empService;
         this.carService = carService;
         this.customerService = customerService;
@@ -53,47 +63,74 @@ public class RentalFormController {
         loadData();
     }
 
+    // ---------------------------------------------------------
+    // Load Cars & Customers
+    // ---------------------------------------------------------
+
     private void loadData() {
+
+        // Load only AVAILABLE cars
         carBox.setItems(FXCollections.observableArrayList(
                 carService.getAllCars().stream()
-                        .filter(c -> c.getStatus() == api.models.CarStatus.AVAILABLE)
+                        .filter(c -> c.getStatus() == CarStatus.AVAILABLE)
                         .toList()
         ));
 
+        // Load all customers
         customerBox.setItems(FXCollections.observableArrayList(customerService.getAllCustomers()));
     }
 
+    // ---------------------------------------------------------
+    // Create Rental
+    // ---------------------------------------------------------
 
     @FXML
-    private void handleCreateRental(){
+    private void handleCreateRental() {
 
         Car car = carBox.getValue();
         Customer cust = customerBox.getValue();
         LocalDate start = startDate.getValue();
         LocalDate end = endDate.getValue();
 
-        if(car == null || cust == null || start == null || end == null){
+        // Basic validation
+        if (car == null || cust == null || start == null || end == null) {
             lblStatus.setText("Fill all fields!");
             return;
         }
 
+        // Date validation
+        if (end.isBefore(start)) {
+            lblStatus.setText("End date cannot be before start date.");
+            return;
+        }
+
+        // Try to create rental through service layer
         boolean success = rentalService.rentCar(car, cust, loggedEmployee, start, end);
 
         if (success) {
             lblStatus.setText("Rental created successfully.");
+
+            // Clear fields
             carBox.setValue(null);
             customerBox.setValue(null);
             startDate.setValue(null);
             endDate.setValue(null);
-            loadData(); // refresh AVAILABLE cars
+
+            // Refresh available cars
+            loadData();
+
         } else {
             lblStatus.setText("Rental could not be created.");
         }
-
     }
+
+    // ---------------------------------------------------------
+    // Find Customer by AFM
+    // ---------------------------------------------------------
 
     @FXML
     private void handleFindCustomer() {
+
         String afm = txtCustomerAfm.getText() == null ? "" : txtCustomerAfm.getText().trim();
 
         if (afm.isBlank()) {
@@ -109,7 +146,7 @@ public class RentalFormController {
             return;
         }
 
-        // ensure it's in the combo list
+        // Ensure the customer exists in the combo list
         if (!customerBox.getItems().contains(found)) {
             customerBox.getItems().add(found);
         }
@@ -118,9 +155,13 @@ public class RentalFormController {
         lblStatus.setText("Customer selected: " + found.getFullName());
     }
 
+    // ---------------------------------------------------------
+    // Navigation Back to Main Menu
+    // ---------------------------------------------------------
 
     @FXML
-    public void goBack(ActionEvent event) throws Exception {
+    public void handleGoBack(ActionEvent event) throws Exception {
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
@@ -131,7 +172,6 @@ public class RentalFormController {
         stage.getScene().setRoot(root);
 
         stage.sizeToScene();
-
         stage.setTitle("Main Menu");
     }
 }

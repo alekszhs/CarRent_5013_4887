@@ -6,17 +6,20 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="gui.EmployeeFormController"
-            prefWidth="500" prefHeight="350">
+            prefWidth="900" prefHeight="600">
 
+    <!-- Title -->
     <top>
         <Label text="Manage Employees"
-               style="-fx-font-size: 22; -fx-font-weight: bold; -fx-padding: 15;"/>
+               style="-fx-font-size: 22; -fx-font-weight: bold; -fx-padding: 15;" />
     </top>
 
+    <!-- Main Content -->
     <center>
         <VBox spacing="12" alignment="CENTER" style="-fx-padding: 20;">
 
-            <TableView fx:id="tableEmployees" prefWidth="700" prefHeight="330">
+            <!-- Table -->
+            <TableView fx:id="tableEmployees" prefWidth="850" prefHeight="300">
                 <columns>
                     <TableColumn fx:id="colFullName" text="Full Name" prefWidth="200"/>
                     <TableColumn fx:id="colUsername" text="Username" prefWidth="140"/>
@@ -24,29 +27,35 @@
                 </columns>
             </TableView>
 
+            <!-- Input fields -->
             <HBox spacing="10" alignment="CENTER">
-                <TextField fx:id="txtFullName" promptText="Full Name" prefWidth="180"/>
-                <TextField fx:id="txtUsername" promptText="Username"  prefWidth="140"/>
-                <TextField fx:id="txtEmail"    promptText="Email"     prefWidth="200"/>
+                <TextField fx:id="txtFullName"  promptText="Full Name" prefWidth="180"/>
+                <TextField fx:id="txtUsername"  promptText="Username"  prefWidth="140"/>
+                <TextField fx:id="txtEmail"     promptText="Email"     prefWidth="200"/>
                 <PasswordField fx:id="txtPassword" promptText="Password" prefWidth="140"/>
             </HBox>
 
+            <!-- Action Buttons -->
             <HBox spacing="12" alignment="CENTER">
                 <Button text="Add"    prefWidth="120" onAction="#handleAdd"/>
                 <Button text="Delete" prefWidth="120" onAction="#handleDelete"/>
                 <Button text="Clear"  prefWidth="120" onAction="#handleClear"/>
             </HBox>
 
-            <Label fx:id="lblStatus" style="-fx-font-size:14; -fx-padding:8;"/>
+            <!-- Status Label -->
+            <Label fx:id="lblStatus"
+                   style="-fx-font-size: 14; -fx-padding: 8; -fx-text-fill: #ff5555;"/>
         </VBox>
     </center>
 
+    <!-- Back Button -->
     <bottom>
-        <Button text="Back"
-                prefWidth="120"
-                style="-fx-padding:10; -fx-font-size:14;"
-                onAction="#goBack"
-                BorderPane.alignment="CENTER"/>
+        <HBox alignment="CENTER" style="-fx-padding: 10;">
+            <Button text="Back"
+                    prefWidth="120"
+                    style="-fx-font-size: 14;"
+                    onAction="#handleGoBack"/>
+        </HBox>
     </bottom>
 
 </BorderPane>

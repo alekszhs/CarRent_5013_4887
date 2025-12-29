@@ -3,6 +3,7 @@ package gui;
 import api.models.Car;
 import api.models.CarStatus;
 import api.services.CarService;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,6 +21,10 @@ import api.services.RentalService;
 
 public class CarFormController {
 
+    // ---------------------------------------------------------
+    // FXML UI Components
+    // ---------------------------------------------------------
+
     @FXML private TableView<Car> tableCars;
     @FXML private TableColumn<Car, String> colId;
     @FXML private TableColumn<Car, String> colPlate;
@@ -35,12 +40,14 @@ public class CarFormController {
     @FXML private TextField txtModel;
     @FXML private TextField txtYear;
     @FXML private TextField txtColor;
-
     @FXML private TextField txtType;
+
     @FXML private ComboBox<CarStatus> cmbStatus;
-
-
     @FXML private Label lblStatus;
+
+    // ---------------------------------------------------------
+    // Services + Logged Employee
+    // ---------------------------------------------------------
 
     private CarService carService;
     private EmployeeService employeeService;
@@ -48,7 +55,10 @@ public class CarFormController {
     private RentalService rentalService;
     private Employee loggedEmployee;
 
-    // === init για injection από Menu ===
+    // ---------------------------------------------------------
+    // Dependency Injection (called from MainMenu)
+    // ---------------------------------------------------------
+
     public void init(EmployeeService empService,
                      CarService carService,
                      CustomerService customerService,
@@ -61,14 +71,14 @@ public class CarFormController {
         this.rentalService = rentalService;
         this.loggedEmployee = loggedEmployee;
 
-        // status combo setup
+        // Populate status dropdown
         cmbStatus.setItems(FXCollections.observableArrayList(CarStatus.values()));
         cmbStatus.setValue(CarStatus.AVAILABLE);
 
-        // load table data
+        // Load initial table data
         loadTable();
 
-        // listener
+        // When user selects a row, populate the form fields
         tableCars.getSelectionModel().selectedItemProperty().addListener((obs, oldCar, newCar) -> {
             if (newCar == null) return;
 
@@ -83,11 +93,11 @@ public class CarFormController {
         });
     }
 
+    // ---------------------------------------------------------
+    // Load Table Data
+    // ---------------------------------------------------------
 
-
-
-    // === Φόρτωση δεδομένων στον πίνακα ===
-    private void loadTable(){
+    private void loadTable() {
         ObservableList<Car> list = FXCollections.observableArrayList(carService.getAllCars());
 
         colId.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getId()));
@@ -101,11 +111,14 @@ public class CarFormController {
         tableCars.setItems(list);
     }
 
+    // ---------------------------------------------------------
+    // Add Car
+    // ---------------------------------------------------------
 
-    // === ADD ===
     @FXML
     public void handleAdd() {
         try {
+            // Read and sanitize input
             String id = safe(txtId);
             String plate = safe(txtPlate);
             String brand = safe(txtBrand);
@@ -114,15 +127,19 @@ public class CarFormController {
             String color = safe(txtColor);
             CarStatus status = cmbStatus.getValue();
 
-            if (id.isEmpty() || plate.isEmpty() || brand.isEmpty() || model.isEmpty() || type.isEmpty() || color.isEmpty()) {
+            // Basic validation
+            if (id.isEmpty() || plate.isEmpty() || brand.isEmpty() || model.isEmpty() ||
+                    type.isEmpty() || color.isEmpty()) {
                 lblStatus.setText("Fill all required fields.");
                 return;
             }
+
             if (status == null) {
                 lblStatus.setText("Select a status.");
                 return;
             }
 
+            // Validate year
             int year;
             try {
                 year = Integer.parseInt(safe(txtYear));
@@ -130,14 +147,17 @@ public class CarFormController {
                 lblStatus.setText("Year must be a number.");
                 return;
             }
+
             int currentYear = java.time.LocalDate.now().getYear();
             if (year < 1900 || year > currentYear + 1) {
                 lblStatus.setText("Invalid year.");
                 return;
             }
 
+            // Create car object
             Car car = new Car(id, plate, brand, model, type, year, color, status);
 
+            // Add through service
             if (carService.addCar(car)) {
                 lblStatus.setText("Car added successfully.");
                 loadTable();
@@ -146,14 +166,15 @@ public class CarFormController {
                 lblStatus.setText("Car could not be added (duplicate ID or plate).");
             }
 
-        } catch (IllegalArgumentException e) {
-            lblStatus.setText(e.getMessage());
         } catch (Exception e) {
             lblStatus.setText("Invalid input.");
         }
     }
 
-    // === UPDATE ===
+    // ---------------------------------------------------------
+    // Update Car
+    // ---------------------------------------------------------
+
     @FXML
     public void handleUpdate() {
         Car selected = tableCars.getSelectionModel().getSelectedItem();
@@ -170,10 +191,12 @@ public class CarFormController {
             String color = safe(txtColor);
             CarStatus status = cmbStatus.getValue();
 
-            if (plate.isEmpty() || brand.isEmpty() || model.isEmpty() || type.isEmpty() || color.isEmpty()) {
+            if (plate.isEmpty() || brand.isEmpty() || model.isEmpty() ||
+                    type.isEmpty() || color.isEmpty()) {
                 lblStatus.setText("Fill all required fields.");
                 return;
             }
+
             if (status == null) {
                 lblStatus.setText("Select a status.");
                 return;
@@ -193,8 +216,9 @@ public class CarFormController {
                 return;
             }
 
+            // Create updated car object
             Car newData = new Car(
-                    selected.getId(), // id stays same
+                    selected.getId(), // ID stays the same
                     plate, brand, model, type, year, color, status
             );
 
@@ -202,14 +226,15 @@ public class CarFormController {
             lblStatus.setText("Car updated successfully.");
             loadTable();
 
-        } catch (IllegalArgumentException e) {
-            lblStatus.setText("Update failed: " + e.getMessage());
         } catch (Exception e) {
             lblStatus.setText("Update failed.");
         }
     }
 
-    // === DELETE ===
+    // ---------------------------------------------------------
+    // Delete Car
+    // ---------------------------------------------------------
+
     @FXML
     public void handleDelete() {
         Car selected = tableCars.getSelectionModel().getSelectedItem();
@@ -227,19 +252,17 @@ public class CarFormController {
         }
     }
 
-    private String safe(TextField tf) {
-        return tf.getText() == null ? "" : tf.getText().trim();
-    }
+    // ---------------------------------------------------------
+    // Search Cars
+    // ---------------------------------------------------------
 
-
-    // === SEARCH ===
     @FXML
     public void handleSearch() {
         String brand = txtBrand.getText();
         String plate = txtPlate.getText();
         String model = txtModel.getText();
         String color = txtColor.getText();
-        CarStatus status = cmbStatus.getValue(); // μπορεί να είναι null -> ignore στο service
+        CarStatus status = cmbStatus.getValue(); // null means "ignore"
 
         var results = carService.searchCars(brand, plate, model, color, status);
         tableCars.setItems(FXCollections.observableArrayList(results));
@@ -247,7 +270,10 @@ public class CarFormController {
         lblStatus.setText("Found " + results.size() + " car(s).");
     }
 
-    // === CLEAR ===
+    // ---------------------------------------------------------
+    // Clear Filters
+    // ---------------------------------------------------------
+
     @FXML
     public void handleClear() {
         txtId.clear();
@@ -258,16 +284,18 @@ public class CarFormController {
         txtYear.clear();
         txtColor.clear();
 
-        cmbStatus.setValue(null); // ώστε το search να αγνοεί status
+        cmbStatus.setValue(null); // null = ignore status in search
 
         loadTable();
         lblStatus.setText("Filters cleared.");
     }
 
-
+    // ---------------------------------------------------------
+    // Navigation Back to Main Menu
+    // ---------------------------------------------------------
 
     @FXML
-    public void goBack(ActionEvent event) throws Exception {
+    public void handleGoBack(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
@@ -277,8 +305,14 @@ public class CarFormController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
         stage.sizeToScene();
-
         stage.setTitle("Main Menu");
+    }
 
+    // ---------------------------------------------------------
+    // Utility
+    // ---------------------------------------------------------
+
+    private String safe(TextField tf) {
+        return tf.getText() == null ? "" : tf.getText().trim();
     }
 }

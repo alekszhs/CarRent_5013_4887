@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefWidth="400" prefHeight="250" xmlns="http://javafx.com/javafx"
+<AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="gui.LoginController">
+            fx:controller="gui.LoginController"
+            prefWidth="400" prefHeight="260">
 
     <children>
-        <VBox spacing="15" alignment="CENTER" AnchorPane.topAnchor="20"
-              AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20">
+        <VBox spacing="15" alignment="CENTER"
+              AnchorPane.topAnchor="20"
+              AnchorPane.leftAnchor="20"
+              AnchorPane.rightAnchor="20">
 
-            <Label text="Car Rental Login" style="-fx-font-size:18; -fx-font-weight:bold;"/>
+            <!-- Title -->
+            <Label text="Car Rental Login"
+                   style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
-            <TextField fx:id="txtUsername" promptText="Username" maxWidth="250"/>
-            <PasswordField fx:id="txtPassword" promptText="Password" maxWidth="250"/>
+            <!-- Username -->
+            <TextField fx:id="txtUsername"
+                       promptText="Username"
+                       maxWidth="250"/>
 
-            <Button text="Login" fx:id="btnLogin" maxWidth="250"
+            <!-- Password -->
+            <PasswordField fx:id="txtPassword"
+                           promptText="Password"
+                           maxWidth="250"/>
+
+            <!-- Login Button -->
+            <Button fx:id="btnLogin"
+                    text="Login"
+                    maxWidth="250"
                     onAction="#handleLoginButton"/>
 
-            <Label fx:id="lblStatus" textFill="red" style="-fx-font-weight:bold;"/>
+            <!-- Status Label -->
+            <Label fx:id="lblStatus"
+                   style="-fx-font-weight: bold; -fx-text-fill: #ff5555;"/>
         </VBox>
     </children>
 </AnchorPane>

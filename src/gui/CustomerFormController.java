@@ -1,7 +1,12 @@
 package gui;
 
 import api.models.Customer;
-import api.services.*;
+import api.models.Employee;
+import api.services.CarService;
+import api.services.CustomerService;
+import api.services.EmployeeService;
+import api.services.RentalService;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -11,10 +16,12 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import api.models.Employee;
-import api.services.CustomerService;
 
 public class CustomerFormController {
+
+    // ---------------------------------------------------------
+    // FXML UI Components
+    // ---------------------------------------------------------
 
     @FXML private TableView<Customer> tableCustomers;
     @FXML private TableColumn<Customer, String> colAfm;
@@ -29,31 +36,41 @@ public class CustomerFormController {
 
     @FXML private Label lblStatus;
 
+    // ---------------------------------------------------------
+    // Services + Logged Employee
+    // ---------------------------------------------------------
+
     private CarService carService;
     private EmployeeService employeeService;
     private CustomerService customerService;
     private RentalService rentalService;
     private Employee loggedEmployee;
 
+    // ---------------------------------------------------------
+    // Dependency Injection (called from MainMenu)
+    // ---------------------------------------------------------
 
-    // ================== Init from MainMenu ==================
     public void init(EmployeeService empService,
                      CarService carService,
                      CustomerService customerService,
                      RentalService rentalService,
                      Employee loggedEmployee) {
+
         this.employeeService = empService;
         this.carService = carService;
         this.customerService = customerService;
         this.rentalService = rentalService;
         this.loggedEmployee = loggedEmployee;
+
         loadTable();
         setupRowClickFill();
     }
 
+    // ---------------------------------------------------------
+    // Load Table Data
+    // ---------------------------------------------------------
 
-    // ================== Load resources.data to table ==================
-    private void loadTable(){
+    private void loadTable() {
         ObservableList<Customer> list =
                 FXCollections.observableArrayList(customerService.getAllCustomers());
 
@@ -65,12 +82,14 @@ public class CustomerFormController {
         tableCustomers.setItems(list);
     }
 
+    // ---------------------------------------------------------
+    // Autofill fields when clicking a row
+    // ---------------------------------------------------------
 
-    // ================== Autofill fields on table click ==================
-    private void setupRowClickFill(){
+    private void setupRowClickFill() {
         tableCustomers.setOnMouseClicked(event -> {
             Customer c = tableCustomers.getSelectionModel().getSelectedItem();
-            if(c == null) return;
+            if (c == null) return;
 
             txtAfm.setText(c.getAfm());
             txtFullName.setText(c.getFullName());
@@ -79,6 +98,9 @@ public class CustomerFormController {
         });
     }
 
+    // ---------------------------------------------------------
+    // Add Customer
+    // ---------------------------------------------------------
 
     @FXML
     public void handleAdd() {
@@ -88,10 +110,12 @@ public class CustomerFormController {
             String phone = safe(txtPhone);
             String email = safe(txtEmail);
 
+            // Basic validation
             if (afm.isEmpty() || fullName.isEmpty() || phone.isEmpty() || email.isEmpty()) {
                 lblStatus.setText("Fill all required fields.");
                 return;
             }
+
             if (!afm.matches("\\d{9}")) {
                 lblStatus.setText("AFM must be exactly 9 digits.");
                 return;
@@ -107,6 +131,10 @@ public class CustomerFormController {
             lblStatus.setText("Add failed: " + e.getMessage());
         }
     }
+
+    // ---------------------------------------------------------
+    // Update Customer
+    // ---------------------------------------------------------
 
     @FXML
     public void handleUpdate() {
@@ -137,6 +165,10 @@ public class CustomerFormController {
         }
     }
 
+    // ---------------------------------------------------------
+    // Delete Customer
+    // ---------------------------------------------------------
+
     @FXML
     public void handleDelete() {
         Customer selected = tableCustomers.getSelectionModel().getSelectedItem();
@@ -154,15 +186,13 @@ public class CustomerFormController {
         }
     }
 
-    private String safe(TextField tf) {
-        return tf.getText() == null ? "" : tf.getText().trim();
-    }
+    // ---------------------------------------------------------
+    // Search Customers
+    // ---------------------------------------------------------
 
-
-    // ================== SEARCH ==================
     @FXML
     public void handleSearch() {
-        String afm = txtAfm.getText();           // (θα είναι disabled, αλλά μπορεί να γεμίζει από click)
+        String afm = txtAfm.getText();   // may be filled from table click
         String fullName = txtFullName.getText();
         String phone = txtPhone.getText();
 
@@ -172,7 +202,10 @@ public class CustomerFormController {
         lblStatus.setText("Found " + results.size() + " customer(s).");
     }
 
-    // ================== CLEAR ==================
+    // ---------------------------------------------------------
+    // Clear Filters
+    // ---------------------------------------------------------
+
     @FXML
     public void handleClear() {
         txtAfm.clear();
@@ -184,10 +217,12 @@ public class CustomerFormController {
         lblStatus.setText("Filters cleared.");
     }
 
+    // ---------------------------------------------------------
+    // Navigation Back to Main Menu
+    // ---------------------------------------------------------
 
-    // ================== Back ==================
     @FXML
-    public void goBack(ActionEvent event) throws Exception {
+    public void handleGoBack(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
@@ -197,7 +232,14 @@ public class CustomerFormController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
         stage.sizeToScene();
-
         stage.setTitle("Main Menu");
+    }
+
+    // ---------------------------------------------------------
+    // Utility
+    // ---------------------------------------------------------
+
+    private String safe(TextField tf) {
+        return tf.getText() == null ? "" : tf.getText().trim();
     }
 }

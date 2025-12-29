@@ -5,6 +5,7 @@ import api.services.CarService;
 import api.services.CustomerService;
 import api.services.EmployeeService;
 import api.services.RentalService;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,17 +15,25 @@ import javafx.scene.Node;
 
 public class MainMenuController {
 
+    // Services injected from LoginController
     private EmployeeService employeeService;
     private CarService carService;
     private CustomerService customerService;
     private RentalService rentalService;
+
+    // Logged-in employee (used for rental creation)
     private Employee loggedEmployee;
 
+    /**
+     * Dependency injection from LoginController.
+     * Keeps GUI free of business logic creation.
+     */
     public void init(EmployeeService empService,
                      CarService carService,
                      CustomerService customerService,
                      RentalService rentalService,
                      Employee loggedEmployee) {
+
         this.employeeService = empService;
         this.carService = carService;
         this.customerService = customerService;
@@ -32,97 +41,79 @@ public class MainMenuController {
         this.loggedEmployee = loggedEmployee;
     }
 
-    @FXML
-    private void openCars(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CarForm.fxml"));
+    // ---------------------------------------------------------
+    // Navigation Helpers
+    // ---------------------------------------------------------
+
+    /**
+     * Loads an FXML file and switches the current scene.
+     * Used by all menu buttons to avoid repeated code.
+     */
+    private void switchScene(ActionEvent event, String fxmlPath, String title) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         Parent root = loader.load();
 
-        CarFormController controller = loader.getController();
-        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
+        // Inject services into the next controller (if it has init())
+        Object controller = loader.getController();
+        try {
+            controller.getClass()
+                    .getMethod("init", EmployeeService.class, CarService.class,
+                            CustomerService.class, RentalService.class, Employee.class)
+                    .invoke(controller, employeeService, carService, customerService, rentalService, loggedEmployee);
+        } catch (NoSuchMethodException ignored) {
+            // Some screens (e.g., Login) have different init signature
+        }
 
-        // Παίρνω το Stage από το κουμπί που πάτησε ο χρήστης
+        // Replace current scene with the new one
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
         stage.sizeToScene();
-        stage.setTitle("Manage Cars");
+        stage.setTitle(title);
+    }
 
+    // ---------------------------------------------------------
+    // Menu Button Handlers
+    // ---------------------------------------------------------
+
+    @FXML
+    private void handleOpenCars(ActionEvent event) throws Exception {
+        // Navigate to car management screen
+        switchScene(event, "/gui/CarForm.fxml", "Manage Cars");
     }
 
     @FXML
-    private void openCustomers(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CustomerForm.fxml"));
-        Parent root = loader.load();
-
-        CustomerFormController controller = loader.getController();
-        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(root);
-        stage.sizeToScene();
-        stage.setTitle("Manage Customers");
-
+    private void handleOpenCustomers(ActionEvent event) throws Exception {
+        // Navigate to customer management screen
+        switchScene(event, "/gui/CustomerForm.fxml", "Manage Customers");
     }
 
     @FXML
-    private void openEmployees(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/EmployeeForm.fxml"));
-        Parent root = loader.load();
-
-        EmployeeFormController controller = loader.getController();
-        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(root);
-        stage.sizeToScene();
-        stage.setTitle("Manage Employees");
-    }
-
-
-    @FXML
-    private void openRentalForm(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/RentalForm.fxml"));
-        Parent root = loader.load();
-
-        RentalFormController controller = loader.getController();
-        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(root);
-        stage.sizeToScene();
-        stage.setTitle("New Rental");
-
+    private void handleOpenEmployees(ActionEvent event) throws Exception {
+        // Navigate to employee management screen
+        switchScene(event, "/gui/EmployeeForm.fxml", "Manage Employees");
     }
 
     @FXML
-    private void openReturnRental(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ReturnRental.fxml"));
-        Parent root = loader.load();
-
-        ReturnRentalController controller = loader.getController();
-        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(root);
-        stage.sizeToScene();
-        stage.setTitle("Return Rental");
+    private void handleOpenRentalForm(ActionEvent event) throws Exception {
+        // Navigate to rental creation screen
+        switchScene(event, "/gui/RentalForm.fxml", "New Rental");
     }
 
     @FXML
-    private void openHistory(ActionEvent event) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/CustomerRentalHistory.fxml"));
-        Parent root = loader.load();
-
-        CustomerRentalHistoryController controller = loader.getController();
-        controller.init(employeeService, carService, customerService, rentalService, loggedEmployee);
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(root);
-        stage.sizeToScene();
-        stage.setTitle("Rental History");
+    private void handleOpenReturnRental(ActionEvent event) throws Exception {
+        // Navigate to rental return screen
+        switchScene(event, "/gui/ReturnRental.fxml", "Return Rental");
     }
 
     @FXML
-    private void logout(ActionEvent event) throws Exception {
+    private void handleOpenHistory(ActionEvent event) throws Exception {
+        // Navigate to rental history screen
+        switchScene(event, "/gui/CustomerRentalHistory.fxml", "Rental History");
+    }
+
+    @FXML
+    private void handleLogout(ActionEvent event) throws Exception {
+        // Load login screen (different init signature)
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
         Parent root = loader.load();
 
@@ -131,10 +122,8 @@ public class MainMenuController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
-
         stage.setTitle("Car Rental - Login");
         stage.sizeToScene();
         stage.centerOnScreen();
-
     }
 }

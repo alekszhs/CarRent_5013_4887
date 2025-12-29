@@ -5,18 +5,31 @@ import api.models.Customer;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * Handles all business logic related to customers:
- * loading, searching, creating and updating customer records.
+ * Provides business logic for managing customers in the rental system.
+ * <p>
+ * This service supports operations such as adding new customers, updating
+ * existing records, searching by multiple criteria, and deleting customers.
+ * AFM is treated as a unique and immutable identifier.
+ * </p>
+ *
+ * @author Αλέξανδρος Γκούρδογλου
+ * @author Θεμιστοκλής Κιουτσούκης
  */
 public class CustomerService {
 
+    // ==================== Fields ====================
+
     private final List<Customer> customers = new ArrayList<>();
+
+
+    // ==================== Finders ====================
 
     /**
      * Finds a customer by AFM.
-     * Returns the matching customer or null if not found.
+     *
+     * @param afm the AFM to search for
+     * @return the matching customer, or null if not found
      */
     public Customer findByAfm(String afm) {
         if (afm == null || afm.isBlank()) {
@@ -34,64 +47,63 @@ public class CustomerService {
         return null;
     }
 
+
+    // ==================== Add Customer ====================
+
     /**
-     * Adds a new customer into the system.
+     * Adds a new customer to the system.
+     * <p>
      * Performs validation checks:
-     * - customer object must not be null
-     * - AFM must not be null or empty
-     * - AFM must be unique
-     * - full name must not be null/empty
-     * - phone must not be null/empty
-     * - email must not be null/empty
+     * <ul>
+     *     <li>Customer object must not be null</li>
+     *     <li>AFM must not be null or empty</li>
+     *     <li>AFM must be unique</li>
+     *     <li>Full name must not be null or empty</li>
+     *     <li>Phone number must not be null or empty</li>
+     *     <li>Email must not be null or empty</li>
+     * </ul>
+     * </p>
      *
-     * @param customer The customer to add.
-     * @throws IllegalArgumentException if any validation fails.
+     * @param customer the customer to add
+     * @throws IllegalArgumentException if validation fails
      */
     public void addCustomer(Customer customer) {
 
-        // Check null object
-        if (customer == null) {
+        if (customer == null)
             throw new IllegalArgumentException("Customer cannot be null.");
-        }
 
-        // Validate AFM
-        if (customer.getAfm() == null || customer.getAfm().isBlank()) {
+        if (customer.getAfm() == null || customer.getAfm().isBlank())
             throw new IllegalArgumentException("AFM cannot be null or empty.");
-        }
 
         String afm = customer.getAfm().trim();
 
-        // Check AFM uniqueness
-        if (findByAfm(afm) != null) {
+        if (findByAfm(afm) != null)
             throw new IllegalArgumentException("A customer with this AFM already exists.");
-        }
 
-        // Validate name
-        if (customer.getFullName() == null || customer.getFullName().isBlank()) {
+        if (customer.getFullName() == null || customer.getFullName().isBlank())
             throw new IllegalArgumentException("Full name cannot be empty.");
-        }
 
-        // Validate phone
-        if (customer.getPhoneNumber() == null || customer.getPhoneNumber().isBlank()) {
+        if (customer.getPhoneNumber() == null || customer.getPhoneNumber().isBlank())
             throw new IllegalArgumentException("Phone cannot be empty.");
-        }
 
-        // Validate email
-        if (customer.getEmail() == null || customer.getEmail().isBlank()) {
+        if (customer.getEmail() == null || customer.getEmail().isBlank())
             throw new IllegalArgumentException("Email cannot be empty.");
-        }
 
-        // All good -> add customer
         customers.add(customer);
     }
 
+
+    // ==================== Update Customer ====================
+
     /**
-     * Updates a customer's information.
+     * Updates an existing customer's information.
+     * <p>
+     * AFM is treated as immutable and cannot be changed.
+     * </p>
      *
-     * @param afm The AFM of the customer to update.
-     * @param newData The new data for the customer.
-     * @throws IllegalArgumentException if the AFM is invalid, customer not found,
-     *                                  or if the new AFM conflicts with another customer.
+     * @param afm     the AFM of the customer to update
+     * @param newData a Customer object containing updated values
+     * @throws IllegalArgumentException if validation fails or customer does not exist
      */
     public void updateCustomer(String afm, Customer newData) {
 
@@ -107,7 +119,7 @@ public class CustomerService {
         if (existing == null)
             throw new IllegalArgumentException("Customer with AFM " + afm + " does not exist.");
 
-        // AFM IS IMMUTABLE: do not allow change
+        // AFM cannot change
         if (newData.getAfm() == null || !afm.equals(newData.getAfm().trim()))
             throw new IllegalArgumentException("AFM cannot be changed.");
 
@@ -126,64 +138,71 @@ public class CustomerService {
     }
 
 
+    // ==================== Delete Customer ====================
+
     /**
      * Deletes a customer from the system.
      *
-     * @param afm The AFM of the customer to delete.
-     * @throws IllegalArgumentException if the AFM is invalid or the customer does not exist.
+     * @param afm the AFM of the customer to delete
+     * @throws IllegalArgumentException if AFM is invalid or customer does not exist
      */
     public void deleteCustomer(String afm) {
 
-        if (afm == null || afm.isBlank()) {
+        if (afm == null || afm.isBlank())
             throw new IllegalArgumentException("AFM cannot be empty.");
-        }
 
         afm = afm.trim();
 
         Customer existing = findByAfm(afm);
 
-        if (existing == null) {
+        if (existing == null)
             throw new IllegalArgumentException("Customer with AFM " + afm + " does not exist.");
-        }
 
         customers.remove(existing);
     }
 
+
+    // ==================== Getters ====================
+
     /**
-     * Return all customers.
+     * Returns all customers currently stored in the service.
+     *
+     * @return list of customers
      */
-    public List<Customer> getAllCustomers(){
-        return customers;
+    public List<Customer> getAllCustomers() {
+        return new ArrayList<>(customers);
     }
+
+
+    // ==================== Search ====================
 
     /**
      * Searches customers using optional criteria.
      * Any null or blank parameter is ignored.
      *
-     * @return List of matching customers.
+     * @param afm         AFM to match (optional)
+     * @param fullName    full name to match (optional)
+     * @param phoneNumber phone number to match (optional)
+     * @return list of matching customers
      */
     public List<Customer> searchCustomers(String afm, String fullName, String phoneNumber) {
 
         List<Customer> results = new ArrayList<>();
 
-        // Normalize inputs
         if (afm != null) afm = afm.trim();
         if (fullName != null) fullName = fullName.trim();
         if (phoneNumber != null) phoneNumber = phoneNumber.trim();
 
         for (Customer c : customers) {
 
-            // AFM match (if AFM is provided)
             if (afm != null && !afm.isBlank()) {
                 if (!c.getAfm().equalsIgnoreCase(afm)) continue;
             }
 
-            // Full name match (if provided) - case-insensitive
             if (fullName != null && !fullName.isBlank()) {
                 if (!c.getFullName().equalsIgnoreCase(fullName)) continue;
             }
 
-            // Phone number match (if provided)
             if (phoneNumber != null && !phoneNumber.isBlank()) {
                 if (!c.getPhoneNumber().equals(phoneNumber)) continue;
             }

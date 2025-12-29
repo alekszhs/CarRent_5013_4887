@@ -18,10 +18,10 @@ public class LoginController {
 
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
-    @FXML private Label lblStatus; // όχι lblMessage – consistency matters
+    @FXML private Label lblStatus;
     @FXML private javafx.scene.control.Button btnLogin;
 
-
+    // Services injected from the main application
     private EmployeeService employeeService;
     private CarService carService;
     private CustomerService customerService;
@@ -29,11 +29,20 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        btnLogin.setDefaultButton(true);             // Enter κάνει login
+        // Allow pressing ENTER to trigger login
+        btnLogin.setDefaultButton(true);
+
+        // ENTER inside password field triggers login
         txtPassword.setOnAction(e -> handleLoginButton());
+
+        // ENTER inside username field moves focus to password
         txtUsername.setOnAction(e -> txtPassword.requestFocus());
     }
 
+    /**
+     * Called by the main application to inject services.
+     * This keeps the controller free of business logic creation.
+     */
     public void init(EmployeeService empService,
                      CarService carService,
                      CustomerService custService,
@@ -54,40 +63,42 @@ public class LoginController {
             String user = txtUsername.getText().trim();
             String pass = txtPassword.getText().trim();
 
-            // 1) Empty validation
+            // Basic empty-field validation
             if (user.isEmpty() || pass.isEmpty()) {
                 lblStatus.setText("Συμπλήρωσε όλα τα πεδία");
                 return;
             }
 
-            // 2) Check credentials
+            // Validate credentials through the service layer
             if (!employeeService.validateLogin(user, pass)) {
                 lblStatus.setText("Λάθος στοιχεία");
                 return;
             }
 
-            // 3) Fetch logged user object
+            // Retrieve the logged-in employee object
             Employee logged = employeeService.findByUsername(user);
 
-            // 4) Load MainMenu view
+            // Load the Main Menu FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
             Parent root = loader.load();
+
+            // Pass services + logged user to the next controller
             MainMenuController controller = loader.getController();
             controller.init(employeeService, carService, customerService, rentalService, logged);
 
-            // 5) Switch scene
-
-
+            // Replace login screen with main menu
             Stage stage = (Stage) txtUsername.getScene().getWindow();
             stage.getScene().setRoot(root);
             stage.sizeToScene();
             stage.centerOnScreen();
             stage.setTitle("Car Rental System");
 
-
         } catch (Exception e) {
+            // Generic fallback error message for the user
             lblStatus.setText("Σφάλμα συστήματος — δοκίμασέ το πάλι");
-            e.printStackTrace(); // LOG ONLY — όχι σε prod
+
+            // Debug output (acceptable for development)
+            e.printStackTrace();
         }
     }
 }

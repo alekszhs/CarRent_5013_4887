@@ -3,14 +3,14 @@ package api.models;
 /**
  * Represents a customer who can rent cars from the company.
  * <p>
- * Each customer has a unique AFM (tax number), full name,
- * phone number and email. This class provides validation
- * through setter methods and simple identity definition
- * via the AFM field.
+ * Each customer is uniquely identified by their AFM (Greek tax number) and
+ * includes personal information such as full name, phone number, and email.
+ * All fields are validated through setter methods to ensure data integrity
+ * across the rental system.
  * </p>
  *
- * @version 1.1
- * @author ...
+ * @author Αλέξανδρος Γκούρδογλου
+ * @author Θεμιστοκλής Κιουτσούκης
  */
 public class Customer {
 
@@ -55,6 +55,9 @@ public class Customer {
 
     /**
      * Sets the customer's AFM (must be exactly 9 digits).
+     *
+     * @param afm the tax number to assign
+     * @throws IllegalArgumentException if the AFM is null, empty, or invalid
      */
     public void setAfm(String afm) {
         if (afm == null || afm.isBlank())
@@ -70,6 +73,9 @@ public class Customer {
 
     /**
      * Sets the customer's full name.
+     *
+     * @param fullName the full name to assign
+     * @throws IllegalArgumentException if the name is null or empty
      */
     public void setFullName(String fullName) {
         if (fullName == null || fullName.isBlank())
@@ -80,6 +86,9 @@ public class Customer {
 
     /**
      * Sets the customer's phone number (must be exactly 10 digits).
+     *
+     * @param phoneNumber the phone number to assign
+     * @throws IllegalArgumentException if the number is null, empty, or invalid
      */
     public void setPhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.isBlank())
@@ -95,6 +104,9 @@ public class Customer {
 
     /**
      * Sets the customer's email, validating its format.
+     *
+     * @param email the email address to assign
+     * @throws IllegalArgumentException if the email is null, empty, or invalid
      */
     public void setEmail(String email) {
         if (email == null || email.isBlank())
@@ -102,15 +114,6 @@ public class Customer {
 
         email = email.trim();
 
-        // Email Validation
-        //^ --> start of string
-        //[^@\\s] ---> No @ , No space , At least one character
-        //+@ --> @ after the string
-        //[^@\\s] ---> No @ , No space , At least one character
-        //+\\. a real dot
-        //[^@\\s] ---> No @ , No space , At least one character
-        //+$ --> end of string
-        //Example : alekszhs@gmail.com will pass    alek szhs@gmail.com will fail(space)
         if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
             throw new IllegalArgumentException("Invalid email format.");
 
@@ -122,6 +125,9 @@ public class Customer {
 
     /**
      * Customers are considered equal if they share the same AFM.
+     *
+     * @param o the object to compare
+     * @return true if the AFM matches, false otherwise
      */
     @Override
     public boolean equals(Object o) {
@@ -141,6 +147,8 @@ public class Customer {
 
     /**
      * Returns a readable representation of the customer.
+     *
+     * @return a formatted string containing the customer's details
      */
     @Override
     public String toString() {

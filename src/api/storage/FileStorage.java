@@ -6,27 +6,71 @@ import api.services.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.time.LocalDate;
 
+/**
+ * Provides persistent storage for the car rental system using CSV files.
+ * <p>
+ * This class saves and loads employees, customers, cars, and rentals
+ * into CSV files located under:
+ * <pre>
+ *   {user.home}/car-rental-data/
+ * </pre>
+ * The folder is automatically created if it does not exist.
+ * </p>
+ *
+ * <p>
+ * FileStorage is used after the first application run. If saved CSV files
+ * exist, the system loads from them instead of the bundled resources.
+ * </p>
+ *
+ * <p><b>Important:</b> This class performs minimal validation and delegates
+ * business rules to the corresponding service classes.</p>
+ *
+ * @author
+ *     Αλέξανδρος Γκούρδογλου,
+ *     Θεμιστοκλής Κιουτσούκης
+ */
 public class FileStorage {
+
+    // ==================== Base Directory ====================
 
     private static final String BASE_DIR =
             System.getProperty("user.home") + File.separator + "car-rental-data";
 
+    /**
+     * Creates the base directory if it does not already exist.
+     */
     public FileStorage() {
-        // Ensure folder exists
         new File(BASE_DIR).mkdirs();
     }
 
-    // ==================== IO HELPERS ====================
 
+    // ==================== IO Helpers ====================
+
+    /**
+     * Returns the full path of a file inside the storage directory.
+     *
+     * @param fileName the file name
+     * @return a Path object pointing to the file
+     */
     private Path path(String fileName) {
         return Paths.get(BASE_DIR, fileName);
     }
 
+    /**
+     * Checks whether a file exists in the storage directory.
+     *
+     * @param fileName the file name
+     * @return true if the file exists
+     */
     private boolean exists(String fileName) {
         return Files.exists(path(fileName));
     }
 
+    /**
+     * Opens a writer for a CSV file, creating or overwriting it.
+     */
     private BufferedWriter writer(String fileName) throws IOException {
         return Files.newBufferedWriter(
                 path(fileName),
@@ -36,13 +80,18 @@ public class FileStorage {
         );
     }
 
+    /**
+     * Opens a reader for a CSV file.
+     */
     private BufferedReader reader(String fileName) throws IOException {
         return Files.newBufferedReader(path(fileName), StandardCharsets.UTF_8);
     }
 
     /**
-     * Checks if persisted state exists.
-     * If true → Main loads from FileStorage instead of resources.
+     * Checks whether all required CSV files exist.
+     * If true, the system loads from FileStorage instead of bundled resources.
+     *
+     * @return true if all saved CSV files exist
      */
     public boolean hasSavedState() {
         return exists("employees.csv")
@@ -51,8 +100,12 @@ public class FileStorage {
                 && exists("rentals.csv");
     }
 
+
     // ==================== SAVE ====================
 
+    /**
+     * Saves all employees to employees.csv.
+     */
     public void saveEmployees(EmployeeService service) throws IOException {
         try (BufferedWriter bw = writer("employees.csv")) {
             bw.write("fullName,username,email,password\n");
@@ -67,6 +120,9 @@ public class FileStorage {
         }
     }
 
+    /**
+     * Saves all cars to cars.csv.
+     */
     public void saveCars(CarService service) throws IOException {
         try (BufferedWriter bw = writer("cars.csv")) {
             bw.write("id,plate,brand,model,type,year,color,status\n");
@@ -85,6 +141,9 @@ public class FileStorage {
         }
     }
 
+    /**
+     * Saves all customers to customers.csv.
+     */
     public void saveCustomers(CustomerService service) throws IOException {
         try (BufferedWriter bw = writer("customers.csv")) {
             bw.write("afm,fullName,phone,email\n");
@@ -100,7 +159,8 @@ public class FileStorage {
     }
 
     /**
-     * rentals.csv format:
+     * Saves all rentals to rentals.csv.
+     * Format:
      * rentalId,carId,afm,username,startDate,endDate,status
      */
     public void saveRentals(RentalService service) throws IOException {
@@ -120,8 +180,12 @@ public class FileStorage {
         }
     }
 
+
     // ==================== LOAD ====================
 
+    /**
+     * Loads employees from employees.csv.
+     */
     public void loadEmployees(EmployeeService service) throws IOException {
         if (!exists("employees.csv")) return;
 
@@ -146,6 +210,9 @@ public class FileStorage {
         }
     }
 
+    /**
+     * Loads cars from cars.csv.
+     */
     public void loadCars(CarService service) throws IOException {
         if (!exists("cars.csv")) return;
 
@@ -181,6 +248,9 @@ public class FileStorage {
         }
     }
 
+    /**
+     * Loads customers from customers.csv.
+     */
     public void loadCustomers(CustomerService service) throws IOException {
         if (!exists("customers.csv")) return;
 
@@ -206,9 +276,11 @@ public class FileStorage {
     }
 
     /**
-     * Loads rentals from persisted state (user.home).
-     * Uses ONLY the existing Rental constructor.
-     * Status is applied AFTER construction.
+     * Loads rentals from rentals.csv.
+     * <p>
+     * Rentals are imported without business validation.
+     * Status is applied after construction.
+     * </p>
      */
     public void loadRentals(
             RentalService rentalService,
@@ -233,8 +305,8 @@ public class FileStorage {
                 String afm      = d[2].trim();
                 String username = d[3].trim();
 
-                var start = java.time.LocalDate.parse(d[4].trim());
-                var end   = java.time.LocalDate.parse(d[5].trim());
+                LocalDate start = LocalDate.parse(d[4].trim());
+                LocalDate end   = LocalDate.parse(d[5].trim());
 
                 RentalStatus status;
                 try {
@@ -249,7 +321,6 @@ public class FileStorage {
 
                 if (car == null || cust == null || emp == null) continue;
 
-                // ONE constructor only
                 Rental rental = new Rental(rentalId, car, cust, emp, start, end);
                 rental.setStatus(status);
 
@@ -258,8 +329,15 @@ public class FileStorage {
         }
     }
 
-    // ==================== UTIL ====================
 
+    // ==================== Utility ====================
+
+    /**
+     * Escapes commas in CSV fields by replacing them with spaces.
+     *
+     * @param s the input string
+     * @return a safe CSV field
+     */
     private String escape(String s) {
         if (s == null) return "";
         return s.replace(",", " ");

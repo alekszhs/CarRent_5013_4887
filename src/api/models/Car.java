@@ -7,8 +7,8 @@ package api.models;
  * brand, model, type, construction year, color, and current status
  * (AVAILABLE, RENTED, etc.).
  * </p>
- * @author Alexandros Gkourdoglou
- * @author /--/
+ * @author Αλέξανδρος Γκούρδογλου
+ * @author Θεμιστοκλής Κιουτσούκης
  */
 public class Car {
 

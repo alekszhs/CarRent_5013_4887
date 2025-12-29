@@ -2,51 +2,62 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="gui.ReturnRentalController"
-      spacing="15"
+      spacing="20"
       alignment="CENTER_LEFT"
-      style="-fx-padding:20;"
-      prefWidth="500" prefHeight="350">
+      style="-fx-padding: 20;"
+      prefWidth="900" prefHeight="600">
 
-    <Label text="Return Rental" style="-fx-font-size:22; -fx-font-weight:bold"/>
+    <!-- Title -->
+    <Label text="Return Rental"
+           style="-fx-font-size: 22; -fx-font-weight: bold;" />
 
+    <!-- Rental ID Row -->
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Rental ID:"/>
-        <TextField fx:id="txtRentalId" prefWidth="200"/>
-        <Button text="Return" onAction="#handleReturn"/>
+        <Label text="Rental ID:" />
+        <TextField fx:id="txtRentalId" prefWidth="200" />
+        <Button text="Return" onAction="#handleReturn" />
     </HBox>
 
-    <Separator/>
+    <Separator />
 
-    <Label text="Active rentals for customer or car:"/>
+    <!-- Search Section -->
+    <Label text="Active rentals for customer or car:" />
 
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="AFM:"/>
-        <TextField fx:id="txtAfm" prefWidth="200"/>
+        <Label text="AFM:" />
+        <TextField fx:id="txtAfm" prefWidth="200" />
 
-        <Label text="Plate:"/>
-        <TextField fx:id="txtPlate" prefWidth="150"/>
+        <Label text="Plate:" />
+        <TextField fx:id="txtPlate" prefWidth="150" />
 
-        <Button text="Search" onAction="#handleSearch"/>
+        <Button text="Search" onAction="#handleSearch" />
     </HBox>
 
-    <TableView fx:id="tableActive" prefHeight="350">
+    <!-- Table -->
+    <TableView fx:id="tableActive" prefHeight="350" prefWidth="850">
         <columns>
-            <TableColumn fx:id="colId" text="Rental ID" prefWidth="100"/>
-            <TableColumn fx:id="colPlate" text="Car Plate" prefWidth="120"/>
-            <TableColumn fx:id="colAfm" text="AFM" prefWidth="130"/>
-            <TableColumn fx:id="colStart" text="From" prefWidth="150"/>
-            <TableColumn fx:id="colEnd" text="To" prefWidth="150"/>
+            <TableColumn fx:id="colId"    text="Rental ID" prefWidth="100" />
+            <TableColumn fx:id="colPlate" text="Car Plate" prefWidth="120" />
+            <TableColumn fx:id="colAfm"   text="AFM"       prefWidth="130" />
+            <TableColumn fx:id="colStart" text="From"      prefWidth="150" />
+            <TableColumn fx:id="colEnd"   text="To"        prefWidth="150" />
         </columns>
     </TableView>
 
-    <Label fx:id="lblStatus" style="-fx-font-size:14;"/>
+    <!-- Status Label -->
+    <Label fx:id="lblStatus"
+           style="-fx-font-size: 14; -fx-text-fill: #ff5555;" />
 
-    <!-- Κουμπί Back -->
-    <Button text="Back" onAction="#goBack"/>
+    <!-- Back Button -->
+    <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+        <Button text="Back"
+                prefWidth="120"
+                style="-fx-font-size: 14;"
+                onAction="#handleGoBack" />
+    </HBox>
 
 </VBox>

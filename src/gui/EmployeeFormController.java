@@ -5,6 +5,7 @@ import api.services.CarService;
 import api.services.CustomerService;
 import api.services.EmployeeService;
 import api.services.RentalService;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +19,10 @@ import javafx.stage.Stage;
 
 public class EmployeeFormController {
 
+    // ---------------------------------------------------------
+    // FXML UI Components
+    // ---------------------------------------------------------
+
     @FXML private TableView<Employee> tableEmployees;
     @FXML private TableColumn<Employee, String> colFullName;
     @FXML private TableColumn<Employee, String> colUsername;
@@ -30,17 +35,26 @@ public class EmployeeFormController {
 
     @FXML private Label lblStatus;
 
+    // ---------------------------------------------------------
+    // Services + Logged Employee
+    // ---------------------------------------------------------
+
     private EmployeeService employeeService;
     private CarService carService;
     private CustomerService customerService;
     private RentalService rentalService;
     private Employee loggedEmployee;
 
+    // ---------------------------------------------------------
+    // Dependency Injection (called from MainMenu)
+    // ---------------------------------------------------------
+
     public void init(EmployeeService empService,
                      CarService carService,
                      CustomerService customerService,
                      RentalService rentalService,
                      Employee loggedEmployee) {
+
         this.employeeService = empService;
         this.carService = carService;
         this.customerService = customerService;
@@ -51,6 +65,10 @@ public class EmployeeFormController {
         loadTable();
         setupRowClickFill();
     }
+
+    // ---------------------------------------------------------
+    // Table Setup
+    // ---------------------------------------------------------
 
     private void setupTable() {
         colFullName.setCellValueFactory(e -> new SimpleStringProperty(e.getValue().getFullName()));
@@ -64,6 +82,10 @@ public class EmployeeFormController {
         tableEmployees.setItems(list);
     }
 
+    // ---------------------------------------------------------
+    // Autofill fields when selecting a row
+    // ---------------------------------------------------------
+
     private void setupRowClickFill() {
         tableEmployees.getSelectionModel().selectedItemProperty().addListener((obs, oldE, newE) -> {
             if (newE == null) return;
@@ -71,9 +93,13 @@ public class EmployeeFormController {
             txtFullName.setText(newE.getFullName());
             txtUsername.setText(newE.getUsername());
             txtEmail.setText(newE.getEmail());
-            txtPassword.setText(newE.getPassword()); // για εργασία ok
+            txtPassword.setText(newE.getPassword()); // acceptable for the assignment
         });
     }
+
+    // ---------------------------------------------------------
+    // Add Employee
+    // ---------------------------------------------------------
 
     @FXML
     private void handleAdd() {
@@ -87,6 +113,7 @@ public class EmployeeFormController {
 
             employeeService.addEmployee(e);
             lblStatus.setText("Employee added.");
+
             handleClear();
             loadTable();
 
@@ -94,6 +121,10 @@ public class EmployeeFormController {
             lblStatus.setText("Add failed: " + ex.getMessage());
         }
     }
+
+    // ---------------------------------------------------------
+    // Delete Employee
+    // ---------------------------------------------------------
 
     @FXML
     private void handleDelete() {
@@ -103,7 +134,7 @@ public class EmployeeFormController {
             return;
         }
 
-        // Μην αφήνεις να σβήσει τον εαυτό του (συχνή παγίδα)
+        // Prevent deleting the logged-in user
         if (loggedEmployee != null &&
                 selected.getUsername().equalsIgnoreCase(loggedEmployee.getUsername())) {
             lblStatus.setText("You cannot delete the logged-in user.");
@@ -113,6 +144,7 @@ public class EmployeeFormController {
         try {
             employeeService.deleteEmployee(selected);
             lblStatus.setText("Employee deleted.");
+
             handleClear();
             loadTable();
 
@@ -121,18 +153,27 @@ public class EmployeeFormController {
         }
     }
 
+    // ---------------------------------------------------------
+    // Clear Fields
+    // ---------------------------------------------------------
+
     @FXML
     private void handleClear() {
         txtFullName.clear();
         txtUsername.clear();
         txtEmail.clear();
         txtPassword.clear();
+
         tableEmployees.getSelectionModel().clearSelection();
         lblStatus.setText("");
     }
 
+    // ---------------------------------------------------------
+    // Navigation Back to Main Menu
+    // ---------------------------------------------------------
+
     @FXML
-    public void goBack(ActionEvent event) throws Exception {
+    public void handleGoBack(ActionEvent event) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainMenu.fxml"));
         Parent root = loader.load();
 
@@ -141,9 +182,7 @@ public class EmployeeFormController {
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(root);
-
         stage.sizeToScene();
-
         stage.setTitle("Main Menu");
     }
 }
