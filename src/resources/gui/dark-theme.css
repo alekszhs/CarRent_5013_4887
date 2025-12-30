@@ -102,3 +102,31 @@
 .date-picker .arrow-button:hover {
     -fx-background-color: #666666;
 }
+
+/* ===========================
+   TABLE HEADER (FIX)
+   =========================== */
+
+/* το άσπρο bar πάνω-πάνω */
+.table-view .column-header-background {
+    -fx-background-color: #2b2b2b;   /* ίδιο με root */
+}
+
+/* κάθε κελί header */
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: #555555;
+    -fx-border-width: 0 1 1 0;      /* κάτω + δεξιά γραμμή */
+}
+
+/* το κείμενο "ID, Plate, Brand..." */
+.table-view .column-header .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* προαιρετικά: γραμμή κάτω από το header */
+.table-view .filler {
+    -fx-background-color: #2b2b2b;
+}
