@@ -6,7 +6,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="gui.MainMenuController"
-            prefWidth="500" prefHeight="380">
+            prefWidth="500" prefHeight="450">
 
     <!-- Title -->
     <top>

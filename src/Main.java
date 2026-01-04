@@ -9,6 +9,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+
 
 import java.util.Objects;
 
@@ -25,30 +27,31 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        // 1) Load saved data if exists, else load initial from resources
         if (storage.hasSavedState()) {
             storage.loadEmployees(employeeService);
             storage.loadCars(carService);
             storage.loadCustomers(customerService);
             storage.loadRentals(rentalService, carService, customerService, employeeService);
+
+            // Always sync car statuses after loading
+            syncCarStatusesFromRentals();
+
         } else {
-            // FIRST RUN: seed from resources
             loader.loadEmployees(employeeService);
             loader.loadCars(carService);
             loader.loadCustomers(customerService);
             loader.loadRentals(rentalService, carService, customerService, employeeService);
 
-            // Persist initial state once so next run loads from user.home
+            // Sync BEFORE saving initial state so saved CSVs are consistent
+            syncCarStatusesFromRentals();
+
             storage.saveEmployees(employeeService);
             storage.saveCars(carService);
             storage.saveCustomers(customerService);
             storage.saveRentals(rentalService);
         }
 
-        // 2) Always sync car statuses based on ACTIVE rentals (source of truth)
-        syncCarStatusesFromRentals();
-
-        // 3) Launch UI
+        // Launch UI
         FXMLLoader fx = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
         Scene scene = new Scene(fx.load());
 
@@ -61,10 +64,20 @@ public class Main extends Application {
 
         stage.setScene(scene);
         stage.setTitle("Car Rental System");
+
+        stage.getIcons().add(
+                new Image(
+                        Objects.requireNonNull(
+                                getClass().getResourceAsStream("/gui/icon64.png")
+                        )
+                )
+        );
+
         stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
     }
+
 
     /**
      * Ensures car availability matches rentals:

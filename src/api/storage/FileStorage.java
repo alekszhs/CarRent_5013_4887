@@ -294,6 +294,7 @@ public class FileStorage {
         try (BufferedReader br = reader("rentals.csv")) {
             br.readLine(); // header
             String line;
+
             while ((line = br.readLine()) != null) {
                 if (line.isBlank()) continue;
 
@@ -305,8 +306,14 @@ public class FileStorage {
                 String afm      = d[2].trim();
                 String username = d[3].trim();
 
-                LocalDate start = LocalDate.parse(d[4].trim());
-                LocalDate end   = LocalDate.parse(d[5].trim());
+                LocalDate start;
+                LocalDate end;
+                try {
+                    start = LocalDate.parse(d[4].trim());
+                    end   = LocalDate.parse(d[5].trim());
+                } catch (Exception ex) {
+                    continue;
+                }
 
                 RentalStatus status;
                 try {
@@ -321,13 +328,20 @@ public class FileStorage {
 
                 if (car == null || cust == null || emp == null) continue;
 
-                Rental rental = new Rental(rentalId, car, cust, emp, start, end);
-                rental.setStatus(status);
+                try {
+                    Rental rental = new Rental(rentalId, car, cust, emp, start, end);
+                    rental.setStatus(status);
 
-                rentalService.getAllRentals().add(rental);
+                    // Raw import (no business validation)
+                    rentalService.importRental(rental);
+
+                } catch (Exception ex) {
+                    continue;
+                }
             }
         }
     }
+
 
 
     // ==================== Utility ====================

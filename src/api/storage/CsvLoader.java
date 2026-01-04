@@ -58,7 +58,7 @@ public class CsvLoader {
     }
 
 
-    // ==================== Load Employees ====================
+// ==================== Load Employees ====================
 
     /**
      * Loads employees from <code>data/users.csv</code>.
@@ -73,7 +73,29 @@ public class CsvLoader {
      * @throws IOException if the CSV file cannot be read
      */
     public void loadEmployees(EmployeeService service) throws IOException {
-        try (BufferedReader br = openResourceCsv("/data/users.csv")) {
+        loadEmployeesFromResources("/data/users.csv", service);
+    }
+
+    /**
+     * Loads employees from a custom CSV resource path.
+     * <p>
+     * This method contains the core implementation logic and can be used
+     * for alternative datasets or automated test cases.
+     * </p>
+     *
+     * <p>
+     * Expected format:
+     * <pre>
+     * name,surname,username,email,password
+     * </pre>
+     * </p>
+     *
+     * @param resourcePath the path to the CSV file inside the resources folder
+     * @param service      the EmployeeService to populate
+     * @throws IOException if the CSV file cannot be read
+     */
+    public void loadEmployeesFromResources(String resourcePath, EmployeeService service) throws IOException {
+        try (BufferedReader br = openResourceCsv(resourcePath)) {
 
             br.readLine(); // skip header
 
@@ -95,6 +117,7 @@ public class CsvLoader {
             }
         }
     }
+
 
 
     // ==================== Load Customers ====================
@@ -160,7 +183,33 @@ public class CsvLoader {
      * @throws IOException if the CSV file cannot be read
      */
     public void loadCars(CarService service) throws IOException {
-        try (BufferedReader br = openResourceCsv("/data/vehicles_with_plates.csv")) {
+        loadCarsFromResources("/data/vehicles_with_plates.csv", service);
+    }
+
+    /**
+     * Loads cars from a custom CSV resource path.
+     * <p>
+     * This method contains the core implementation logic and can be used
+     * for alternative datasets or automated test cases.
+     * </p>
+     *
+     * <p>
+     * Expected format:
+     * <pre>
+     * id,plate,brand,type,model,year,color,status
+     * </pre>
+     * Status is interpreted as:
+     * <ul>
+     *     <li>"Διαθέσιμο" → AVAILABLE</li>
+     *     <li>anything else → RENTED</li>
+     * </ul>
+     *
+     * @param resourcePath the path to the CSV file inside the resources folder
+     * @param service      the CarService to populate
+     * @throws IOException if the CSV file cannot be read
+     */
+    public void loadCarsFromResources(String resourcePath, CarService service) throws IOException {
+        try (BufferedReader br = openResourceCsv(resourcePath)) {
 
             br.readLine(); // skip header
 
@@ -193,6 +242,7 @@ public class CsvLoader {
     }
 
 
+
     // ==================== Load Rentals ====================
 
     /**
@@ -222,8 +272,51 @@ public class CsvLoader {
             CustomerService customerService,
             EmployeeService employeeService
     ) throws IOException {
+        loadRentalsFromResources(
+                "/data/rentals.csv",
+                rentalService,
+                carService,
+                customerService,
+                employeeService
+        );
+    }
 
-        try (BufferedReader br = openResourceCsv("/data/rentals.csv")) {
+    /**
+     * Loads rentals from a custom CSV resource path.
+     * <p>
+     * This method contains the core implementation logic and can be used
+     * for alternative datasets or automated test cases.
+     * </p>
+     *
+     * <p>
+     * Expected format:
+     * <pre>
+     * rentalId,carId,afm,username,startDate,endDate,status
+     * </pre>
+     * </p>
+     *
+     * <p>
+     * Rentals are imported <b>without applying business rules</b>.
+     * After loading, the system should synchronize car availability
+     * based on ACTIVE rentals.
+     * </p>
+     *
+     * @param resourcePath    the path to the CSV file inside the resources folder
+     * @param rentalService   the RentalService to populate
+     * @param carService      used to resolve car references
+     * @param customerService used to resolve customer references
+     * @param employeeService used to resolve employee references
+     * @throws IOException if the CSV file cannot be read
+     */
+    public void loadRentalsFromResources(
+            String resourcePath,
+            RentalService rentalService,
+            CarService carService,
+            CustomerService customerService,
+            EmployeeService employeeService
+    ) throws IOException {
+
+        try (BufferedReader br = openResourceCsv(resourcePath)) {
 
             br.readLine(); // skip header
 
@@ -238,8 +331,16 @@ public class CsvLoader {
                 String carId    = d[1].trim();
                 String afm      = d[2].trim();
                 String username = d[3].trim();
-                LocalDate start = LocalDate.parse(d[4].trim());
-                LocalDate end   = LocalDate.parse(d[5].trim());
+
+                LocalDate start;
+                LocalDate end;
+                try {
+                    start = LocalDate.parse(d[4].trim());
+                    end   = LocalDate.parse(d[5].trim());
+                } catch (Exception ex) {
+                    // malformed dates -> skip this line
+                    continue;
+                }
 
                 RentalStatus status;
                 try {
@@ -252,15 +353,23 @@ public class CsvLoader {
                 Customer cust = customerService.findByAfm(afm);
                 Employee emp = employeeService.findByUsername(username);
 
-                if (car == null || cust == null || emp == null)
+                if (car == null || cust == null || emp == null) {
                     continue;
+                }
 
-                Rental rental = new Rental(rentalId, car, cust, emp, start, end);
-                rental.setStatus(status);
+                try {
+                    Rental rental = new Rental(rentalId, car, cust, emp, start, end);
+                    rental.setStatus(status);
 
-                // Raw import (no business validation)
-                rentalService.getAllRentals().add(rental);
+                    // Raw import (no business validation)
+                    rentalService.importRental(rental);
+
+                } catch (Exception ex) {
+                    // invalid row -> skip
+                    continue;
+                }
             }
         }
     }
+
 }

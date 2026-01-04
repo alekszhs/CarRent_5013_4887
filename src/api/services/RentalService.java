@@ -271,4 +271,23 @@ public class RentalService {
     public List<Rental> getAllRentals() {
         return new ArrayList<>(rentals);
     }
+
+    // ==================== Import Rental (Raw) ====================
+
+    /**
+     * Imports a rental "as-is" without applying business rules.
+     * Used by loaders to restore persisted state.
+     *
+     * @param rental the rental to import
+     * @return true if imported successfully, false otherwise
+     */
+    public boolean importRental(Rental rental) {
+        if (rental == null) return false;
+        if (rental.getRentalId() == null || rental.getRentalId().isBlank()) return false;
+        if (rentalIdExists(rental.getRentalId())) return false;
+
+        rentals.add(rental);
+        return true;
+    }
+
 }
