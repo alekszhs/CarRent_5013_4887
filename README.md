@@ -1,38 +1,21 @@
 # Car Rental Management System 🚗
 
-A robust Java desktop application designed for car rental companies to manage their fleet, clients, and active rentals. This project was developed as a collaborative assignment for the **Object-Oriented Programming** course during the academic year 2025-2026.
+[![Java Version](https://img.shields.io/badge/Java-17%2B-orange.svg)](https://www.oracle.com/java/)
+[![Architecture](https://img.shields.io/badge/Architecture-Layered%20%2F%20Separation%20of%20Concerns-blue)](https://en.wikipedia.org/wiki/Separation_of_concerns)
+[![Academic Project](https://img.shields.io/badge/Course-Object--Oriented%20Programming-red)](https://www.csd.auth.gr/)
 
-## 🌟 Key Features
+A production-ready Java desktop application tailored for car rental agencies. Built strictly on Object-Oriented Programming (OOP) principles, this system enables corporate employees to seamlessly manage vehicle fleets, register clients, track rentals, and handle real-time car returns with reliable local persistence.
 
-- **Secure Employee Authentication:** Login/Logout mechanism tailored strictly for company employees with shared access to the system's data.
-- **Fleet Management:** Add, edit, and search for vehicles using combined criteria (Brand, Model, Plate, Color, Status).
-- **Client Management:** Independent registration and modification of clients with unique Tax IDs (ΑΦΜ).
-- **Rental & Return Workflow:** Streamlined process for checking car availability, calculating rental dates, and processing returns with instant status updates.
-- **Persistent Data Storage:** Automatic state saving and loading using relative file paths (CSV/Text files) to ensure seamless data persistence across application restarts.
-- **Comprehensive History Logs:** View historical and active rental data filtered by individual client or specific vehicle.
+Developed as a collaborative final project for the **Object-Oriented Programming** course (Academic Year 2025-2026) at the Department of Informatics, Aristotle University of Thessaloniki (AUTh).
 
 ---
 
-## 🏗️ Architecture & Design Principles
+## 🏗️ Architecture & Design Choices
 
-The application strictly adheres to the principle of **Separation of Concerns**, splitting the codebase into distinct packages to decouple core business logic from the user interface:
-
-- `api`: Contains the backend logic, data processing, object models (`Car`, `Client`, `Rental`, `Employee`), and file I/O operations. **No UI components exist in this layer.**
-- `gui`: Handles the Desktop Graphical User Interface (built with [Swing / JavaFX - συμπλήρωσε τι βάλατε]) and interacts exclusively with the `api` layer.
-
-### Applied OOP Concepts:
-- **Encapsulation:** Strict data hiding using private fields and public getters/setters across all model entities.
-- **Inheritance & Polymorphism:** Utilized to manage varying entities and shared behaviors effectively.
-- **Data Validation:** Bulletproof input validation with user-friendly error dialogs directly on the GUI for edge cases (e.g., duplicate Tax IDs, negative values, missing fields).
-
----
-
-## 📂 Project Structure
+The project enforces a strict **Layered Architecture (Separation of Concerns)** to ensure high maintainability and decoupled code.
 
 ```text
-CarRent_AEM1_AEM2/
-├── src/
-│   ├── api/          # Business logic, file I/O, and core system entities
-│   └── gui/          # UI components, forms, and event listeners
-├── data/             # Persistent storage files (users.csv, vehicles_with_plates.csv)
-└── README.md
+CarRent_5013_4887/
+└── src/
+    ├── api/    # Core Domain Models & Business Logic (Pure Java, No UI components)
+    └── gui/    # Presentation Layer (Java Swing, Windows, Forms & Event Listeners)
